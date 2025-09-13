@@ -1,0 +1,50 @@
+export const popularProducts=[
+    {
+        id:'pop1',
+        title:'Burgers & Fast food',
+        restaurants:21,
+        img:'/inplate/burgerinplate.png'
+    },
+     {
+        id:'pop2',
+        title:'Salads',
+        restaurants:31,
+        img:'/inplate/saladsinplate.png'
+    },
+     {
+        id:'pop3',
+        title:'Pasta & Casuals',
+        restaurants:26,
+        img:'/inplate/PastaCasualsinplate.png'
+    },
+     {
+        id:'pop4',
+        title:'Pizza',
+        restaurants:23,
+        img:'/inplate/Pizzainplate.png'
+    },
+     {
+        id:'pop5',
+        title:'Breakfast',
+        restaurants:29,
+        img:'/inplate/Breakfastinplate.png'
+    },
+     {
+        id:'pop6',
+        title:'Soup',
+        restaurants:41,
+        img:'/inplate/soupinplate.png'
+    },
+     {
+        id:'pop7',
+        title:'Rice',
+        restaurants:35,
+        img:'/inplate/riceinplate.png'
+    },
+     {
+        id:'pop8',
+        title:'Pasta',
+        restaurants:19,
+        img:'/inplate/pastainplate.png'
+    }
+]

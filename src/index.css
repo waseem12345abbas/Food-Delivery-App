@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+::-webkit-scrollbar{
+  display: none;
+}
+
+body{
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.custom-pagination .swiper-pagination-bullet {
+  background-color: transparent;
+  opacity: 1;
+  width: 12px;
+  height: 12px;
+  margin: 0 4px;
+  border: 1px solid yellow;
+  border-radius: 50%;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+
+}
+
+.custom-pagination .swiper-pagination-bullet-active {
+  background-color: yellow; 
+  transform: scale(1.1); 
+}
+@theme {
+  /* light theme colors */
+  --color-light-pagebg: #ffffff;
+  --color-light-btnbg: #000000;
+  --color-light-btnHover: #0000004D;
+  --color-light-headerbg: #ffffff;
+  --color-light-navLinks: #000000;
+  --color-light-h1:#000000;
+  --color-light-h2:#000000;
+  --color-light-h3:#000000;
+  --color-light-text:#000000;
+
+  /* dark theme colors */
+  --color-dark-pagebg: #12372a;
+  --color-dark-btnbg: #000000;
+  --color-dark-btnHover: #0000004D;
+  --color-dark-headerbg: #0B3D2E;
+  --color-dark-navLinks: #FBFADA;
+  --color-dark-h1:#FBFADA;
+  --color-dark-h2:#ADBC9F;
+  --color-dark-h3:;
+  --color-dark-text:#ADBC9F;
+
+  --color-primary: #FF7F50;
+  --color-secondary: #FFD166;
+  --color-accent: #06D6A0;
+  --color-background: #121212;
+  --color-card: #1E1E2F;
+  --color-textPrimary: #F5F5F5;
+  --color-textSecondary: #B0B0B0;
+  --color-border: #2A2A3C;
+  --color-error: #EF476F;
+  --color-success: #06D6A0;
+  --shadow-soft: 0px 4px 10px rgba(0,0,0,0.4);
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@utility no-scrollbar {
+  @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
+}
+
