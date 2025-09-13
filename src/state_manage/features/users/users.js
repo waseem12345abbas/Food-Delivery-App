@@ -1,13 +1,13 @@
 // here I'll fetch users by making api call to the backend
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import api from '../../../api';
 
 // fetch users from the backend
 export const fetchUsers = createAsyncThunk(
   'users/fetchUsers',
   async (_, { rejectWithValue }) => {
     try {
-        const response= await axios.get('http://localhost:5000/api/users')
+        const response= await api.get('/api/users')
         if(response.data.success){
             return response.data.data
         }else{

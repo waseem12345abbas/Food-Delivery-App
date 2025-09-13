@@ -1,11 +1,11 @@
-import axios from "axios";
+import api from "../../../api";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const updateProduct = createAsyncThunk(
     "products/updateProduct",
     async ({ id, updateData }, { rejectWithValue }) => {
         try {
-            const response = await axios.put(`http://localhost:5000/api/updateProduct/${id}`, updateData);
+            const response = await api.put(`/api/updateProduct/${id}`, updateData);
             if (response.data.success) {
                 return response.data.data;
             }

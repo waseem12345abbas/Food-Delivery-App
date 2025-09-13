@@ -1,14 +1,26 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import api from "../../api";
-const socket = io("http://localhost:5000");
 import { FaCheck , FaCamera} from 'react-icons/fa'
 
 export default function OrderStatus() {
   const [order, setOrder] = useState(null);
   const [orderId, setOrderId] = useState(null);
+  const [socket, setSocket] = useState(null);
+  useEffect(()=>{
+    // initialize socket connection
+    const newSocket = io(
+      process.env.REACT_APP_SOCKET_URL ||
+      "http://localhost:5000"
+    );
+    setSocket(newSocket)
 
+    return ()=>{
+      newSocket.disconnect()
+    }
+  },[])
   useEffect(() => {
+    if (!socket) return;
     const fetchOrder = async () => {
       try {
         const resUser = await api.get("/api/profile");

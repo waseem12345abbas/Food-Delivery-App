@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { io } from "socket.io-client";
 import api from "../../api";
 
-const socket = io("http://localhost:5000");
 
 export default function UpdateOrder() {
   const [order, setOrder] = useState(null);
@@ -12,8 +10,22 @@ export default function UpdateOrder() {
   const [orderId, setOrderId] = useState(null);
   const [error, setErorr] = useState("");
   const [message, setMessage] = useState("");
-  
+  const [socket, setSocket] = useState(null);
+
+  useEffect(()=>{
+    const newSocket = io(
+      process.env.REACT_APP_SOCKET_URL ||
+      "http://localhost:5000"
+    );
+    setSocket(newSocket)
+
+    return ()=>{
+      newSocket.disconnect()
+    }
+  },[])
+
   useEffect(() => {
+    if(!socket) return;
     const fetchOrder = async () => {
       try {
         const res = await api.get("/api/profile");

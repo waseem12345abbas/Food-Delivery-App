@@ -1,12 +1,12 @@
 // this will request to delete a product from database permanently
-import axios from "axios";
+import api from "../../../api";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const deleteProduct = createAsyncThunk(
     "products/deleteProduct",
     async(id, { rejectWithValue }) => {
        try {
-        const response = await axios.delete(`http://localhost:5000/api/deleteProduct/${id}`);
+        const response = await api.delete(`/api/deleteProduct/${id}`);
         if(response.data.success){
             return id
         }
