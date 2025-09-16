@@ -1,17 +1,19 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../../api";
 import { FaTimes } from "react-icons/fa";
+import { useAuth } from "../../auth/AuthProvider";
 
 const ProofOfOrder = () => {
   const [paymentId, setPaymentId] = useState("");
   const [file, setFile] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const [orderSubmitted, setOrderSubmitted] = useState(false);
+  const [orderProceed, setOrderProceed] = useState(false);
+  const { user, isAuthed } = useAuth();
 
-  const { cartItems, user } = location.state || { cartItems: [], user: {} };
-  const { _id, name, email } = user;
-  const userData = { _id, name, email };
+  const { cartItems} = location.state || { cartItems: []};
 
   const orderData = cartItems.map((order) => ({
     id: order._id,
@@ -26,25 +28,54 @@ const ProofOfOrder = () => {
       alert("Please upload proof and enter Payment ID.");
       return;
     }
+    const confirmTrack = window.confirm("Do you want to track order then login?");
+    if (confirmTrack) {
+      // Submit the order first without navigating
+      const success = await submitOrder(false);
+      if (success) {
+        // Then check if user is already logged in
+        if (isAuthed && user) {
+          // User is logged in, navigate to my-order page directly
+          navigate("/my-order");
+        } else {
+          // Set redirect after login to my-order page
+          sessionStorage.setItem("redirectAfterLogin", "/my-order");
+          navigate("/login");
+        }
+      }
+    } else {
+      submitOrder(true);
+    }
+  };
 
+  const submitOrder = async (navigateToSuccess = true) => {
     const formDataToSend = new FormData();
     formDataToSend.append("paymentId", paymentId);
     formDataToSend.append("proofImage", file);
-    formDataToSend.append("formData", JSON.stringify(userData));
     formDataToSend.append("cartItems", JSON.stringify(orderData));
+    if (isAuthed && user) {
+      formDataToSend.append("formData", JSON.stringify({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      }));
+    }
 
     try {
       const res = await api.post("/api/userOrder", formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       if (res.data.success) {
-        alert("Order submitted! Wait for admin confirmation");
-        setOrderSubmitted(true);
+        if (navigateToSuccess) {
+          navigate("/success");
+        }
+        return true;
       }
     } catch (error) {
       console.log("Error while submitting the order", error);
       alert("Error submitting order. Check console for details.");
     }
+    return false;
   };
 
   return (
@@ -133,6 +164,13 @@ const ProofOfOrder = () => {
           >
             View My Orders
           </Link>
+        </div>
+      )}
+
+      {/* Order Proceed Message */}
+      {orderProceed && (
+        <div className="my-6 relative bg-blue-100 border border-blue-400 text-blue-700 px-6 py-5 rounded-lg shadow-md text-center">
+          <p className="text-lg font-medium">Order proceed</p>
         </div>
       )}
     </div>

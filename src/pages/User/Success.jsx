@@ -11,7 +11,7 @@ const Success = () => {
           Thank you for your purchase. Your order has been confirmed.
         </p>
         <a
-          href="/"
+          href="/home"
           className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
         >
           Go Back to Home

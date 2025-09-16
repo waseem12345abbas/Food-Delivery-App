@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 const StartOver = () => {
     const navigate = useNavigate()
     const handleDiveIn = () =>{
-        navigate("/home")
+        navigate("/login-or-guest")
     }
 
     const handleDelivery = () =>{
-        navigate("/login")
+        navigate("/login-or-guest")
     }
   return (
     <div
@@ -27,7 +27,7 @@ const StartOver = () => {
         <button 
         onClick={handleDiveIn}
         className="px-10 py-4 bg-black/70 text-white text-xl rounded-2xl shadow-lg hover:bg-black/90 transition transform hover:scale-105">
-          Dive In
+          Dine In
         </button>
         <button 
         onClick={handleDelivery}

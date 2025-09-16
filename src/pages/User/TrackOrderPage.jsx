@@ -7,10 +7,12 @@ export default function OrderStatus() {
   const [order, setOrder] = useState(null);
   const [orderId, setOrderId] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   useEffect(()=>{
     // initialize socket connection
     const newSocket = io(
-      process.env.REACT_APP_SOCKET_URL ||
+      import.meta.env.REACT_APP_SOCKET_URL ||
       "http://localhost:5000"
     );
     setSocket(newSocket)
@@ -18,6 +20,7 @@ export default function OrderStatus() {
     return ()=>{
       newSocket.disconnect()
     }
+    
   },[])
   useEffect(() => {
     if (!socket) return;
@@ -27,26 +30,33 @@ export default function OrderStatus() {
         if (resUser) {
           const email = resUser.data.email;
           const resOrder = await api.get(`/api/orders/${email}`);
-          const { _id } = resOrder.data.data[0];
+          if (resOrder.data.data && resOrder.data.data.length > 0) {
+            const { _id } = resOrder.data.data[0];
 
-          setOrderId(_id);
+            setOrderId(_id);
 
-          // Fetch initial order details
-          const resOrderDetails = await api.get(`/api/order/${_id}`);
-          setOrder(resOrderDetails.data);
+            // Fetch initial order details
+            const resOrderDetails = await api.get(`/api/order/${_id}`);
+            setOrder(resOrderDetails.data);
 
-          // join order room
-          socket.emit("joinOrder", _id);
+            // join order room
+            socket.emit("joinOrder", _id);
 
-          // listen for updates
-          socket.on("orderUpdated", (updatedOrder) => {
-            setOrder(updatedOrder);
-          });
+            // listen for updates
+            socket.on("orderUpdated", (updatedOrder) => {
+              setOrder(updatedOrder);
+            });
+          } else {
+            setError("No orders found for this user.");
+          }
         } else {
-          console.log("NO User Found");
+          setError("User not found.");
         }
       } catch (error) {
         console.error("Error fetching order:", error);
+        setError("Failed to load order status. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -55,7 +65,7 @@ export default function OrderStatus() {
     return () => {
       socket.off("orderUpdated");
     };
-  }, [orderId]);
+  }, [socket]);
 
   return (
     <div className="p-6 bg-white shadow-lg rounded-2xl max-w-2xl mx-auto border border-gray-200">

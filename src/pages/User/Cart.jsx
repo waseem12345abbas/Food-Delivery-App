@@ -8,23 +8,23 @@ const Cart = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.cart);
   const navigate = useNavigate();
-  const { user, isAuthed } = useAuth();
+  // const { user, isAuthed } = useAuth();
   const deliveryFee = 1.0;
   const totalPrice =
     cartItems.reduce((total, item) => total + item.price * item.quantity, 0) +
     deliveryFee;
   const handlePlaceOrder = () => {
     // Check if user is authenticated using AuthProvider
-    if (!isAuthed || !user) {
-      if (window.confirm("You are not logged in. Would you like to login?")) {
-        navigate("/login");
-      }
-      return;
-    }
+    // if (!isAuthed || !user) {
+    //   if (window.confirm("You are not logged in. Would you like to login?")) {
+    //     navigate("/login");
+    //   }
+    //   return;
+    // }
 
     // User is authenticated, proceed to order page
     navigate("/proof-of-order", {
-      state: { cartItems, user },
+      state: { cartItems},
     });
   };
   return (
@@ -45,7 +45,6 @@ const Cart = () => {
                 key={item._id}
                 className="overflow-hidden flex flex-row items-center border border-neutral-200 rounded-md"
               >
-                {console.log("IIIIIIIIIIIIIII = ", item)}
                 <div className="h-48 bg-gray-100 flex items-center justify-center">
                   {item.image ? (
                     <img

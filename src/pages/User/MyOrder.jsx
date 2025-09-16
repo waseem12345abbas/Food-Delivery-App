@@ -1,34 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import api from "../../api";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 
 const MyOrder = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchOrders = async () => {
       try {
+        // Fetch user profile to get email
         const res = await api.get("/api/profile");
         const email = res.data.email;
-        if (res) {
-          try {
-            const orderRes = await api.get(`/api/orders/${email}`);
-            setOrders(orderRes.data.data || []);
-          } catch (error) {
-            console.error("Error fetching orders:", error);
-          } finally {
-            setLoading(false);
-          }
+        if (email) {
+          // Fetch orders by user email
+          const orderRes = await api.get(`/api/orders/${email}`);
+          setOrders(orderRes.data.data || []);
         }
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching orders:", error);
+      } finally {
         setLoading(false);
       }
     };
-    fetchUser();
+    fetchOrders();
   }, []);
 
   if (loading)

@@ -27,19 +27,21 @@ import AdminRoute from "./auth/AdminRoute";
 import AuthProvider from "./auth/AuthProvider";
 import UpdateOrder from "./pages/Admin/UpdateOrder";
 import StartOver from "./pages/User/StartOver";
+import LoginOrGuest from "./pages/User/LoginOrGuest";
 
 
 function Layout({ toggleTheme, darkMode }) {
   const location = useLocation();
   const hideNavbarFooter = location.pathname.startsWith('/admin')
   ||
-  ["/login","/register","/"].includes(location.pathname);
+  ["/login","/register","/","/login-or-guest"].includes(location.pathname);
   return (
     <>
       {!hideNavbarFooter && <Navbar toggleTheme={toggleTheme} darkMode={darkMode} />}
       <Routes>
         {<Route path="/" element={<StartOver />} />}
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/login-or-guest" element={<LoginOrGuest />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
@@ -51,7 +53,11 @@ function Layout({ toggleTheme, darkMode }) {
         <Route path="/success" element={<Success />} />
         <Route path="/cancel" element={<Cancel />} />
         <Route path="/proof-of-order" element={<ProofOfOrder />} />
-        <Route path="/my-order" element={<MyOrder/>}/>
+        <Route path="/my-order" element={
+          <PrivateRoute>
+            <MyOrder/>
+          </PrivateRoute>
+        }/>
         <Route path="*" element={<ErrorPage />} />
         <Route path="/profile" element={
           <PrivateRoute>
