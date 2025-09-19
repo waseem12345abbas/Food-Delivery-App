@@ -1,13 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setServiceType } from "../../state_manage/features/users/userSession";
 
 const StartOver = () => {
     const navigate = useNavigate()
-    const handleDiveIn = () =>{
-        navigate("/login-or-guest")
-    }
-
-    const handleDelivery = () =>{
+    const dispatch = useDispatch()
+    const handleSession = (type)=>{
+        dispatch(setServiceType(type))
         navigate("/login-or-guest")
     }
   return (
@@ -25,12 +25,12 @@ const StartOver = () => {
       {/* Buttons */}
       <div className="flex flex-col md:flex-row gap-6">
         <button 
-        onClick={handleDiveIn}
+        onClick={()=>handleSession("dine-in")}
         className="px-10 py-4 bg-black/70 text-white text-xl rounded-2xl shadow-lg hover:bg-black/90 transition transform hover:scale-105">
           Dine In
         </button>
         <button 
-        onClick={handleDelivery}
+        onClick={()=>handleSession("delivery")}
         className="px-10 py-4 bg-white/80 text-black text-xl rounded-2xl shadow-lg hover:bg-white transition transform hover:scale-105">
           Delivery
         </button>

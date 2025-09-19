@@ -26,11 +26,17 @@ const usersSlice = createSlice({
     name: 'users',
     initialState:{
         users: [],
+        currentUser: null,
         status: 'idle', // idle | loading | succeeded | failed
         error: null,
     },
     reducers:{
-
+        setUserData: (state , action)=>{
+            state.currentUser = action.payload
+        },
+        clearUserData: (state)=>{
+            state.currentUser = null
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -48,4 +54,5 @@ const usersSlice = createSlice({
         }
 })
 
+export const { setUserData, clearUserData} = usersSlice.actions
 export default usersSlice.reducer;

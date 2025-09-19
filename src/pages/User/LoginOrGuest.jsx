@@ -1,17 +1,35 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUser } from 'react-icons/fa';
-import { MdPersonOutline } from 'react-icons/md';
-import { AiOutlineUser } from 'react-icons/ai';
+import { useDispatch } from "react-redux";
+import { setUserType} from "../../state_manage/features/users/userSession";
+import { setUserData } from '../../state_manage/features/users/users';
+
 
 const LoginOrGuest = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
-  const handleLogin = () => {
+  // here is a function which will create dummy user with unique data each time
+  const generateGuestUser = () =>{
+    const _id = 'guest_' + Math.random().toString(36).substr(2, 9);
+    const name = 'Guest_' + Math.random().toString(36).substr(2, 5);
+    const email = _id + '@guest.com';
+    return {
+      _id,
+      name,
+      email,
+      isGuest: true,
+    };
+  }
+  const handleLogin = (type) => {
+    dispatch(setUserType(type))
     navigate("/login");
   };
 
-  const handleGuest = () => {
+  const handleGuest = (type) => {
+    dispatch(setUserType(type))
+    dispatch(setUserData(generateGuestUser()))
     navigate("/home");
   };
 
@@ -38,13 +56,13 @@ const LoginOrGuest = () => {
         {/* Buttons */}
         <div className="flex flex-col md:flex-row gap-6">
           <button
-            onClick={handleLogin}
+            onClick={ () => handleLogin("login")}
             className="px-12 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xl font-semibold rounded-3xl shadow-lg hover:shadow-2xl hover:scale-105 transition transform"
           >
             🔑 Login
           </button>
           <button
-            onClick={handleGuest}
+            onClick={ () => handleGuest("guest")}
             className="px-12 py-4 bg-white/90 backdrop-blur-md text-gray-800 text-xl font-semibold rounded-3xl shadow-lg hover:bg-white hover:scale-105 transition transform"
           >
             <div className="flex items-center justify-center gap-x-2"><span className="text-black"><FaUser/></span><span>Guest</span></div>

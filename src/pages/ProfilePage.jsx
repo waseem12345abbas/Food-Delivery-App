@@ -12,11 +12,9 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         const res = await api.get("/api/profile");
-        console.log("RESRESRES = ",res)
         setProfileUser(res.data);
         setError(null);
       } catch (err) {
-        console.error("Profile fetch failed:", err);
         setError("Failed to load profile");
         setProfileUser(null);
       } finally {
@@ -30,7 +28,6 @@ export default function ProfilePage() {
     try {
       await logout();
     } catch (err) {
-      console.error("Logout failed:", err);
       setError("Logout failed. Please try again.");
     }
   };

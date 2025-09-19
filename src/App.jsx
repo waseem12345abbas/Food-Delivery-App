@@ -28,6 +28,7 @@ import AuthProvider from "./auth/AuthProvider";
 import UpdateOrder from "./pages/Admin/UpdateOrder";
 import StartOver from "./pages/User/StartOver";
 import LoginOrGuest from "./pages/User/LoginOrGuest";
+import DeliveryAddress from "./pages/User/DeliveryAddress";
 
 
 function Layout({ toggleTheme, darkMode }) {
@@ -48,6 +49,7 @@ function Layout({ toggleTheme, darkMode }) {
         <Route path="/track-order" element={<TrackOrderPage />} />
         <Route path="/careers" element={<CareersPage />} />
         <Route path="/cart" element={<Cart/>}/>
+        <Route path="/delivery-address" element={<DeliveryAddress />} />
         <Route path="/register" element={<Register/>}/>
         <Route path="/login" element={<Login/>}/>
         <Route path="/success" element={<Success />} />

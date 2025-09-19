@@ -3,17 +3,23 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../../api";
 import { FaTimes } from "react-icons/fa";
 import { useAuth } from "../../auth/AuthProvider";
+import { useSelector } from "react-redux";
+
 
 const ProofOfOrder = () => {
+  // get user session either user is guest or logged in user and is dive-in or delivery
+  const userSession = useSelector((state)=>state.userSession)
+  // get user from redux store
+  const userFromStore = useSelector((state)=>state.users.currentUser)
   const [paymentId, setPaymentId] = useState("");
   const [file, setFile] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
   const [orderSubmitted, setOrderSubmitted] = useState(false);
   const [orderProceed, setOrderProceed] = useState(false);
-  const { user, isAuthed } = useAuth();
+  const [payAtCounter, setPayAtCounter] = useState(false);
 
-  const { cartItems} = location.state || { cartItems: []};
+  const { cartItems, address } = location.state || { cartItems: [], address: null };
 
   const orderData = cartItems.map((order) => ({
     id: order._id,
@@ -22,67 +28,74 @@ const ProofOfOrder = () => {
     price: order.price,
   }));
 
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!paymentId || !file) {
-      alert("Please upload proof and enter Payment ID.");
-      return;
-    }
-    const confirmTrack = window.confirm("Do you want to track order then login?");
-    if (confirmTrack) {
-      // Submit the order first without navigating
-      const success = await submitOrder(false);
-      if (success) {
-        // Then check if user is already logged in
-        if (isAuthed && user) {
-          // User is logged in, navigate to my-order page directly
-          navigate("/my-order");
-        } else {
-          // Set redirect after login to my-order page
-          sessionStorage.setItem("redirectAfterLogin", "/my-order");
-          navigate("/login");
-        }
+      if(userSession.serviceType === "dine-in" && payAtCounter){
+      const success = await submitGuestOrder()
+      if(success){
+        navigate('my-order')
+      }else{
+        navigate('/home')
       }
-    } else {
-      submitOrder(true);
+    }else if(userSession.serviceType === "dine-in" && !payAtCounter){
+      e.preventDefault();
+      if (!file || !paymentId) {
+        alert("Please provide both payment proof and payment ID.");
+        return;
+      }
+      const success = await submitGuestOrder()
+      if(success){
+        navigate('my-order')
+      }else{
+        navigate('/home')
+      }
     }
   };
-
-  const submitOrder = async (navigateToSuccess = true) => {
-    const formDataToSend = new FormData();
-    formDataToSend.append("paymentId", paymentId);
-    formDataToSend.append("proofImage", file);
-    formDataToSend.append("cartItems", JSON.stringify(orderData));
-    if (isAuthed && user) {
-      formDataToSend.append("formData", JSON.stringify({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-      }));
+  // this function is submitting the order to the backend
+  // it will send the paymentId, proof image, cart items and user data if user is logged in
+  // if user is guest then it will send only paymentId, proof image and cart items
+  // after successful submission it will navigate to success page or show error message
+  // submit guest order
+  const submitGuestOrder = async () =>{
+    const formDataToSend = new FormData()
+    if(payAtCounter){
+      formDataToSend.append("payAtCounter", true);
+      formDataToSend.append("cartItems", JSON.stringify(orderData));
+      formDataToSend.append("userData", JSON.stringify(userFromStore));
+    }else{
+      formDataToSend.append("paymentId", paymentId);
+      formDataToSend.append("proofImage", file);
+      formDataToSend.append("cartItems", JSON.stringify(orderData));
+      formDataToSend.append("userData", JSON.stringify(userFromStore));
     }
-
     try {
       const res = await api.post("/api/userOrder", formDataToSend, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      if (res.data.success) {
-        if (navigateToSuccess) {
-          navigate("/success");
+        headers: { "Content-Type": "multiplart/form-data"}})
+        if(res.data.success){
+          setOrderSubmitted(true)
         }
         return true;
-      }
     } catch (error) {
-      console.log("Error while submitting the order", error);
-      alert("Error submitting order. Check console for details.");
+      alert(error || "Error submitting order. Check console for details." );
     }
-    return false;
-  };
+  }
+
 
   return (
     <div className="max-w-lg mx-auto p-8 bg-white rounded-2xl shadow-lg shadow-yellow-400 my-12 border border-yellow-500">
       <h1 className="text-3xl font-bold text-center mb-8 text-black">
         Proof of Payment
       </h1>
+      {address && (
+        <div className="mb-6 p-4 bg-yellow-100 border border-yellow-300 rounded-lg text-black">
+          <h2 className="text-xl font-semibold mb-2">Delivery Address</h2>
+          <p><strong>Name:</strong> {address.name}</p>
+          <p><strong>Phone:</strong> {address.phone}</p>
+          <p><strong>Street:</strong> {address.street}</p>
+          <p><strong>City:</strong> {address.city}</p>
+          <p><strong>Postal Code:</strong> {address.postalCode}</p>
+        </div>
+      )}
 
       {/* Payment Options */}
       <div className="space-y-6 mb-8 bg-yellow-400 p-4 rounded-lg shadow-inner">
@@ -142,6 +155,16 @@ const ProofOfOrder = () => {
           Submit Proof
         </button>
       </form>
+      {/* if user want to want at counter show this button only if user is dive in*/}
+      {
+        userSession.serviceType === "dine-in" && (
+      <div className="mt-6 text-center">
+        <button 
+        onClick={()=>setPayAtCounter(true)}
+        className="px-4 py-2 text-center rounded-md bg-black text-yellow-500">Pay At Counter</button>
+      </div>
+        )
+      }
 
       {/* Success Message */}
       {orderSubmitted && (

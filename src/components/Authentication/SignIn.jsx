@@ -33,10 +33,8 @@ const LoginForm = () => {
         const redirectPath = sessionStorage.getItem("redirectAfterLogin");
         if (redirectPath) {
           sessionStorage.removeItem("redirectAfterLogin");
-          console.log("Login: Redirecting to previous page:", redirectPath);
           setTimeout(() => navigate(redirectPath), 700);
         } else {
-          console.log("Login: No redirect path found, redirecting to home");
           setTimeout(() => navigate("/home"), 700);
         }
       } else {

@@ -2,11 +2,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { removeToCart, addToCart, decreaseQuantity } from "../../state_manage/features/cart/Cart";
 import { useNavigate } from "react-router-dom";
 import { FaTimes, FaMinus, FaPlus } from "react-icons/fa";
-import { useAuth } from "../../auth/AuthProvider";
-
 const Cart = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.cart);
+  // select user session from redux store if user wants delivery then navigate user to delivery address page 
+  // otherwise navigate to order proof page
+  const userSession = useSelector((state)=>state.userSession)
   const navigate = useNavigate();
   // const { user, isAuthed } = useAuth();
   const deliveryFee = 1.0;
@@ -14,15 +15,13 @@ const Cart = () => {
     cartItems.reduce((total, item) => total + item.price * item.quantity, 0) +
     deliveryFee;
   const handlePlaceOrder = () => {
-    // Check if user is authenticated using AuthProvider
-    // if (!isAuthed || !user) {
-    //   if (window.confirm("You are not logged in. Would you like to login?")) {
-    //     navigate("/login");
-    //   }
-    //   return;
-    // }
-
     // User is authenticated, proceed to order page
+    if(userSession.serviceType === "delivery"){
+      navigate("/delivery-address", {
+        state: { cartItems},
+      });
+      return;
+    }
     navigate("/proof-of-order", {
       state: { cartItems},
     });
