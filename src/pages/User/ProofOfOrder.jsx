@@ -1,14 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../../api";
 import { FaTimes } from "react-icons/fa";
 import { useAuth } from "../../auth/AuthProvider";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setServiceType, setUserType } from "../../state_manage/features/users/userSession";
+import { setUserData } from "../../state_manage/features/users/users";
+
+// Constants
+const NAVIGATION_PATHS = {
+  MY_ORDER: '/my-order',
+  HOME: '/home'
+};
+
+const ERROR_MESSAGES = {
+  MISSING_PROOF: "Please provide both payment proof and payment ID.",
+  SUBMIT_ERROR: "Error submitting order. Please try again."
+};
 
 
 const ProofOfOrder = () => {
+  const dispatch = useDispatch()
   // get user session either user is guest or logged in user and is dive-in or delivery
   const userSession = useSelector((state)=>state.userSession)
+  useEffect(()=>{
+  if(userSession.serviceType === "" || userSession.userType === "" || userSession.userData === null){
+     // get session data from session storage in case of page refresh
+  const sessionServiceType = sessionStorage.getItem("serviceType")
+  const sessionUserType = sessionStorage.getItem("userType")
+  const sessionUserData = sessionStorage.getItem("userData") ? JSON.parse(sessionStorage.getItem("userData")) : null
+    if(sessionServiceType) dispatch(setServiceType(sessionServiceType))
+    if(sessionUserType) dispatch(setUserType(sessionUserType))
+    if(sessionUserData) dispatch(setUserData(sessionUserData))
+  }
+  },[])
+ 
+ 
+  // if user is logged in get user data
+  const { user } = useAuth();
   // get user from redux store
   const userFromStore = useSelector((state)=>state.users.currentUser)
   const [paymentId, setPaymentId] = useState("");
@@ -18,6 +47,7 @@ const ProofOfOrder = () => {
   const [orderSubmitted, setOrderSubmitted] = useState(false);
   const [orderProceed, setOrderProceed] = useState(false);
   const [payAtCounter, setPayAtCounter] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { cartItems, address } = location.state || { cartItems: [], address: null };
 
@@ -29,25 +59,33 @@ const ProofOfOrder = () => {
   }));
 
 
+  const validateForm = () => {
+    if (!payAtCounter && (!file || !paymentId)) {
+      alert(ERROR_MESSAGES.MISSING_PROOF);
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
-      if(userSession.serviceType === "dine-in" && payAtCounter){
-      const success = await submitGuestOrder()
-      if(success){
-        navigate('my-order')
-      }else{
-        navigate('/home')
+    if (userSession.serviceType === "dine-in" && payAtCounter) {
+      // No validation needed, proceed directly
+      const success = await submitOrder();
+      if (success) {
+        navigate(NAVIGATION_PATHS.MY_ORDER);
+      } else {
+        navigate(NAVIGATION_PATHS.HOME);
       }
-    }else if(userSession.serviceType === "dine-in" && !payAtCounter){
+    } else {
       e.preventDefault();
-      if (!file || !paymentId) {
-        alert("Please provide both payment proof and payment ID.");
+      if (!validateForm()) {
         return;
       }
-      const success = await submitGuestOrder()
-      if(success){
-        navigate('my-order')
-      }else{
-        navigate('/home')
+      const success = await submitOrder();
+      if (success) {
+        navigate(NAVIGATION_PATHS.MY_ORDER);
+      } else {
+        navigate(NAVIGATION_PATHS.HOME);
       }
     }
   };
@@ -56,29 +94,40 @@ const ProofOfOrder = () => {
   // if user is guest then it will send only paymentId, proof image and cart items
   // after successful submission it will navigate to success page or show error message
   // submit guest order
-  const submitGuestOrder = async () =>{
-    const formDataToSend = new FormData()
-    if(payAtCounter){
+  const submitOrder = async () => {
+    setIsLoading(true);
+    const formDataToSend = new FormData();
+    formDataToSend.append("cartItems", JSON.stringify(orderData));
+    if(address){
+      formDataToSend.append("address", JSON.stringify(address));
+    }
+    if (payAtCounter) {
       formDataToSend.append("payAtCounter", true);
-      formDataToSend.append("cartItems", JSON.stringify(orderData));
       formDataToSend.append("userData", JSON.stringify(userFromStore));
-    }else{
+    } else {
       formDataToSend.append("paymentId", paymentId);
       formDataToSend.append("proofImage", file);
-      formDataToSend.append("cartItems", JSON.stringify(orderData));
-      formDataToSend.append("userData", JSON.stringify(userFromStore));
+      formDataToSend.append("userData", JSON.stringify(user || userFromStore));
     }
     try {
       const res = await api.post("/api/userOrder", formDataToSend, {
-        headers: { "Content-Type": "multiplart/form-data"}})
-        if(res.data.success){
-          setOrderSubmitted(true)
-        }
-        return true;
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log("Response from server:", formDataToSend);
+      if (res.data.success) {
+        setOrderSubmitted(true);
+      } else {
+        alert(ERROR_MESSAGES.SUBMIT_ERROR);
+        return false;
+      }
+      return true;
     } catch (error) {
-      alert(error || "Error submitting order. Check console for details." );
+      alert(error?.message || ERROR_MESSAGES.SUBMIT_ERROR);
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
 
   return (
@@ -96,6 +145,7 @@ const ProofOfOrder = () => {
           <p><strong>Postal Code:</strong> {address.postalCode}</p>
         </div>
       )}
+
 
       {/* Payment Options */}
       <div className="space-y-6 mb-8 bg-yellow-400 p-4 rounded-lg shadow-inner">
@@ -150,9 +200,10 @@ const ProofOfOrder = () => {
         />
         <button
           type="submit"
-          className="w-full bg-yellow-400 hover:bg-yellow-500 text-black py-3 rounded-xl font-semibold shadow-md hover:scale-105 transition"
+          disabled={isLoading}
+          className="w-full bg-yellow-400 hover:bg-yellow-500 text-black py-3 rounded-xl font-semibold shadow-md hover:scale-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Submit Proof
+          {isLoading ? "Submitting..." : "Submit Proof"}
         </button>
       </form>
       {/* if user want to want at counter show this button only if user is dive in*/}

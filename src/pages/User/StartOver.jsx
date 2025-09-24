@@ -8,6 +8,7 @@ const StartOver = () => {
     const dispatch = useDispatch()
     const handleSession = (type)=>{
         dispatch(setServiceType(type))
+        sessionStorage.setItem("serviceType", type)
         navigate("/login-or-guest")
     }
   return (

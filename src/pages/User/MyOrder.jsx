@@ -12,16 +12,37 @@ const MyOrder = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        // Fetch user profile to get email
-        const res = await api.get("/api/profile");
-        const email = res.data.email;
-        if (email) {
-          // Fetch orders by user email
-          const orderRes = await api.get(`/api/orders/${email}`);
-          setOrders(orderRes.data.data || []);
+        const userType = sessionStorage.getItem("userType");
+        const userData = sessionStorage.getItem("userData");
+
+        if (userType === "guest" && userData) {
+          // For guest users, parse guest data and fetch orders by guest email
+          const guestUser = JSON.parse(userData);
+          const guestUserId = guestUser._id;
+          console.log("Guest User id:", guestUser._id);
+          if (guestUserId) {
+            console.log("Fetching orders for guest user id:", guestUserId);
+            // Fetch orders by guest email
+            const orderRes = await api.get(`/api/order/${guestUserId}`);
+            console.log("Orders for guest:", orderRes);
+            setOrders(orderRes.data.data || []);
+          }
+        } else {
+          // For authenticated users, fetch profile and then orders
+          const res = await api.get("/api/profile");
+          const email = res.data.email;
+          if (email) {
+            const orderRes = await api.get(`/api/orders/${email}`);
+            setOrders(orderRes.data.data || []);
+          }
         }
       } catch (error) {
         console.error("Error fetching orders:", error);
+        // For guest users, if the API fails, show empty orders
+        const userType = sessionStorage.getItem("userType");
+        if (userType === "guest") {
+          setOrders([]);
+        }
       } finally {
         setLoading(false);
       }

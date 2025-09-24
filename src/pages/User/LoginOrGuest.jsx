@@ -28,8 +28,11 @@ const LoginOrGuest = () => {
   };
 
   const handleGuest = (type) => {
+    const guestUser = generateGuestUser();
     dispatch(setUserType(type))
-    dispatch(setUserData(generateGuestUser()))
+    dispatch(setUserData(guestUser))
+    sessionStorage.setItem("userType", type)
+    sessionStorage.setItem("userData", JSON.stringify(guestUser))
     navigate("/home");
   };
 

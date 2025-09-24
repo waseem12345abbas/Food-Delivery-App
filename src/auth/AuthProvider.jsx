@@ -45,6 +45,15 @@ export default function AuthProvider({ children }) {
         if (status === 401 && !original._retry) {
           original._retry = true;
 
+          // Check if user is a guest - if so, don't try to refresh token
+          const userType = sessionStorage.getItem("userType");
+          const isGuestUser = userType === "guest";
+
+          if (isGuestUser) {
+            // For guest users, don't try to refresh token, just reject the request
+            return Promise.reject(error);
+          }
+
           // queue the original request
           const promise = new Promise((resolve, reject) => {
             queue.push({ resolve, reject, config: original });
