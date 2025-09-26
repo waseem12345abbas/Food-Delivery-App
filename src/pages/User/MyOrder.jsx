@@ -18,13 +18,12 @@ const MyOrder = () => {
         if (userType === "guest" && userData) {
           // For guest users, parse guest data and fetch orders by guest email
           const guestUser = JSON.parse(userData);
-          const guestUserId = guestUser._id;
-          console.log("Guest User id:", guestUser._id);
-          if (guestUserId) {
-            console.log("Fetching orders for guest user id:", guestUserId);
+          const guestEmail = guestUser.email;
+          console.log("GGGGGGGGGGGGGGGG = ", guestEmail)
+          if (guestEmail) {
             // Fetch orders by guest email
-            const orderRes = await api.get(`/api/order/${guestUserId}`);
-            console.log("Orders for guest:", orderRes);
+            const orderRes = await api.get(`/api/orders/${guestEmail}`);
+            console.log("JJJJJJJJJJJJJJJJ = ", orderRes.data.data)
             setOrders(orderRes.data.data || []);
           }
         } else {

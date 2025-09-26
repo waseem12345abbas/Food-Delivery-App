@@ -122,6 +122,12 @@ export default function AuthProvider({ children }) {
     await api.post('/api/logout');
     setAccessToken(null);
     setUser(null);
+    // Clear token from localStorage
+    localStorage.removeItem("token");
+    // Clear any stored redirect paths
+    sessionStorage.removeItem("redirectAfterLogin");
+    // Redirect to login page
+    navigate('/login', { replace: true });
   };
    if (loading) {
     return <p className="text-center mt-10">Loading session...</p>;

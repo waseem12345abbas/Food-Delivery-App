@@ -32,6 +32,7 @@ const ProofOfOrder = () => {
     if(sessionServiceType) dispatch(setServiceType(sessionServiceType))
     if(sessionUserType) dispatch(setUserType(sessionUserType))
     if(sessionUserData) dispatch(setUserData(sessionUserData))
+      console.log("UUUUUUUUUUUUUUUUUUUUUUU = ", sessionUserData)
   }
   },[])
  
@@ -40,6 +41,7 @@ const ProofOfOrder = () => {
   const { user } = useAuth();
   // get user from redux store
   const userFromStore = useSelector((state)=>state.users.currentUser)
+  console.log("UUUUUUUUUUUUSSSSSSSSSSSSs = ", userFromStore)
   const [paymentId, setPaymentId] = useState("");
   const [file, setFile] = useState(null);
   const location = useLocation();
@@ -108,8 +110,10 @@ const ProofOfOrder = () => {
       formDataToSend.append("paymentId", paymentId);
       formDataToSend.append("proofImage", file);
       formDataToSend.append("userData", JSON.stringify(user || userFromStore));
+      console.log("UUUUUUUUUUUUUUUUUUU = ", userFromStore)
     }
     try {
+      console.log("Data In Form = ", formDataToSend)
       const res = await api.post("/api/userOrder", formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
