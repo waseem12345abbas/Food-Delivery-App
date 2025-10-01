@@ -11,7 +11,6 @@ const DeliveryAddress = () => {
     phone: "",
     street: "",
     city: "",
-    postalCode: "",
   });
 
   const handleChange = (e) => {
@@ -22,7 +21,7 @@ const DeliveryAddress = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Validate form
-    if (!address.name || !address.phone || !address.street || !address.city || !address.postalCode) {
+    if (!address.name || !address.phone || !address.street || !address.city) {
       alert("Please fill in all fields.");
       return;
     }
@@ -71,15 +70,6 @@ const DeliveryAddress = () => {
           name="city"
           placeholder="City"
           value={address.city}
-          onChange={handleChange}
-          className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          required
-        />
-        <input
-          type="text"
-          name="postalCode"
-          placeholder="Postal Code"
-          value={address.postalCode}
           onChange={handleChange}
           className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
           required

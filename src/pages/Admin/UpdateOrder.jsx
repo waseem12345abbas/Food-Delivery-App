@@ -26,18 +26,18 @@ export default function UpdateOrder() {
   }, []);
 
   // fetch order using payment id
-  const fetchOrderByPaymentId = async () => {
+  const fetchOrderById = async () => {
     if (!inputPaymentId.trim()) return;
     setLoading(true);
     setError("");
     // trying to fetch order
     try {
-      const ress = await api.get(`/api/order/payment/${inputPaymentId}`);
-      setOrder(ress.data);
-      console.log("RRRRRRRRRRRRRRr = ", ress.data);
+      const ress = await api.get(`/api/order/${inputPaymentId}`);
+      setOrder(ress.data.data);
+      console.log("RRRRRRRRRRRRRRr = ", ress.data.data._id);
       setStages(ress.data.stages || []);
       setTimer(ress.data.timer || { startTime: "", endTime: "" });
-      setOrderId(ress.data._id);
+      setOrderId(ress.data.data._id);
     } catch (error) {
       // if order is not fetched then response error message
       setError(
@@ -68,7 +68,7 @@ export default function UpdateOrder() {
   useEffect(() => {
     if (message) {
       const timer = setTimeout(() => setMessage(""), 3000);
-      return () => clearTimeout(timer);
+      return () => clearTimeout(timer); 
     }
   }, [message]);
 
@@ -171,7 +171,7 @@ export default function UpdateOrder() {
           </button>
         ) : (
           <button
-            onClick={fetchOrderByPaymentId}
+            onClick={fetchOrderById}
             className="text-nowrap bg-black text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-transform hover:scale-105"
           >
             Fetch Order
@@ -328,7 +328,7 @@ export default function UpdateOrder() {
               <p className="text-center my-2">
                 Give Rider Details at the end when all stages are completed.
               </p>
-              <form onSubmit={(e) => { e.preventDefault(); addRider(); }}>
+              <form onSubmit={(e) => { e.preventDefault(); addRider(); }} className="flex flex-col md:flex-row gap-3 justify-center items-center">
                 <input
                   onChange={handleRider}
                   name="rName"
@@ -357,6 +357,7 @@ export default function UpdateOrder() {
                   Add
                 </button>
               </form>
+              {/* when order is completed then admin will press completed  */}
             </div>
           )}
         </>

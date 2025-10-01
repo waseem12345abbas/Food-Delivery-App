@@ -62,6 +62,9 @@ const ProofOfOrder = () => {
 
 
   const validateForm = () => {
+    if(payAtCounter){
+      return true
+    }
     if (!payAtCounter && (!file || !paymentId)) {
       alert(ERROR_MESSAGES.MISSING_PROOF);
       return false;
@@ -70,6 +73,7 @@ const ProofOfOrder = () => {
   };
 
   const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
     if (userSession.serviceType === "dine-in" && payAtCounter) {
       // No validation needed, proceed directly
       const success = await submitOrder();
@@ -79,7 +83,6 @@ const ProofOfOrder = () => {
         navigate(NAVIGATION_PATHS.HOME);
       }
     } else {
-      e.preventDefault();
       if (!validateForm()) {
         return;
       }
@@ -146,7 +149,6 @@ const ProofOfOrder = () => {
           <p><strong>Phone:</strong> {address.phone}</p>
           <p><strong>Street:</strong> {address.street}</p>
           <p><strong>City:</strong> {address.city}</p>
-          <p><strong>Postal Code:</strong> {address.postalCode}</p>
         </div>
       )}
 
@@ -214,9 +216,15 @@ const ProofOfOrder = () => {
       {
         userSession.serviceType === "dine-in" && (
       <div className="mt-6 text-center">
-        <button 
-        onClick={()=>setPayAtCounter(true)}
-        className="px-4 py-2 text-center rounded-md bg-black text-yellow-500">Pay At Counter</button>
+        <button
+        onClick={()=>
+          {
+            setPayAtCounter(true);
+            handleSubmit()}
+        }
+        className="px-4 py-2 text-center rounded-md bg-black text-yellow-500">
+          Pay At Counter
+        </button>
       </div>
         )
       }

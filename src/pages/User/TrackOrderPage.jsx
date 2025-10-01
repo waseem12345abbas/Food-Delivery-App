@@ -8,7 +8,14 @@ export default function OrderStatus() {
   const [orderId, setOrderId] = useState(null);
   const [socket, setSocket] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [resError, setResError] = useState(null);
+  const [loggedInUser, setLoggedInUser] = useState(null);
+  const [selectedDelivery, setSelectedDelivery] = useState(null)
+  const [selectedFood, setSelectedFood] = useState(null)
+  const [successMsg, setSuccessMsg] = useState(null)
+
+  // delivery rating stars array
+  const deliveryRatingRivews = ["Very Bad", "Bad", "Okay", "Good", "Excellent"];
 
   useEffect(() => {
     const newSocket = io(
@@ -18,6 +25,14 @@ export default function OrderStatus() {
 
     return () => newSocket.disconnect();
   }, []);
+
+  // show popup of succcess message for small amout of time
+  useEffect(()=>{
+    if(successMsg){
+   const timer = setTimeout(() => setSuccessMsg(""), 3000);
+   return ()=> clearTimeout(timer)
+    }
+  },[successMsg])
 
   useEffect(() => {
     if (!socket) return;
@@ -39,32 +54,35 @@ export default function OrderStatus() {
             socket.on("orderUpdated", (updatedOrder) => setOrder(updatedOrder));
             return;
           } else {
-            setError("No orders found for this user.");
+            setResError("No orders found for this user.");
             return;
           }
-        }
-
-        const resUser = await api.get("/api/profile");
-        if (resUser) {
-          const email = resUser.data.email;
-          const resOrder = await api.get(`/api/orders/${email}`);
-          if (resOrder.data.data?.length > 0) {
-            const { _id } = resOrder.data.data[0];
-            setOrderId(_id);
-
-            const resOrderDetails = await api.get(`/api/order/${_id}`);
-            setOrder(resOrderDetails.data);
-
-            socket.emit("joinOrder", _id);
-            socket.on("orderUpdated", (updatedOrder) => setOrder(updatedOrder));
-          } else {
-            setError("No orders found for this user.");
-          }
         } else {
-          setError("User not found.");
+          const resUser = await api.get("/api/profile");
+          if (resUser) {
+            setLoggedInUser(resUser.data);
+            const email = resUser.data.email;
+            const resOrder = await api.get(`/api/orders/${email}`);
+            if (resOrder.data.data?.length > 0) {
+              const { _id } = resOrder.data.data[0];
+              setOrderId(_id);
+
+              const resOrderDetails = await api.get(`/api/order/${_id}`);
+              setOrder(resOrderDetails.data);
+
+              socket.emit("joinOrder", _id);
+              socket.on("orderUpdated", (updatedOrder) =>
+                setOrder(updatedOrder)
+              );
+            } else {
+              setResError("No orders found for this user.");
+            }
+          } else {
+            setResError("User not found.");
+          }
         }
       } catch (error) {
-        setError("Failed to load order status. Please try again.");
+        setResError("Failed to load order status. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -73,13 +91,44 @@ export default function OrderStatus() {
     fetchOrder();
     return () => socket.off("orderUpdated");
   }, [socket]);
+  // update the order with client rivews
+  const clientRiview = async (type, val) => {
+    try {
+      if(type==="food"){
+      setSelectedFood(val)
+      const res = await api.put(`/api/orders/rating/${orderId}`, { clientRatingFood: val });
+      if(res.data.success){
+        setSuccessMsg(res.data.message)
+      }else{
+        setResError("Failed Rating: " + res.data.message)
+      }
+      }
+      else{
+      setSelectedDelivery(val)
+      const res = await api.put(`/api/orders/rating/${orderId}`, { clientRatingDelivery: val });
+       if(res.data.success){
+        setSuccessMsg(res.data.message)
+      }else{
+        setResError("Failed Rating: " + res.data.message)
+      }
+      }
 
+    } catch (error) {
+      setResError("Error while rating: " + error.message)
+    }
+  };
   return (
     <div className="p-6 bg-white shadow-lg rounded-2xl max-w-3xl mx-auto border border-gray-200">
       <h2 className="text-3xl font-bold text-green-700 text-center mb-6">
         🚚 Order Status
       </h2>
-
+      {/* show error or success message */}
+      {
+        successMsg && (
+          <div className="text-center text-xl text-green-500 bg-green-300 py-3 px-4 rounded my-10">{successMsg}</div>
+        )
+        
+      }
       {order ? (
         <div>
           {/* Current Stage Info */}
@@ -89,8 +138,10 @@ export default function OrderStatus() {
               {order?.stages?.length}
             </span>
           </h3>
-          {error && (
-            <div className="text-red-500 font-semibold text-center">{error}</div>
+          {resError && (
+            <div className="text-red-500 font-semibold text-center">
+              {resError}
+            </div>
           )}
 
           {/* Order Stages */}
@@ -193,41 +244,71 @@ export default function OrderStatus() {
           )}
 
           {/* Feedback Section */}
-          <div className="mt-10 bg-gray-50 border border-green-300 rounded-xl shadow-md p-6">
-            <h2 className="text-xl font-bold text-center text-green-700 mb-6">
-              Share Your Feedback
-            </h2>
+          {order?.riderDetails && loggedInUser && (
+              <div className="mt-10 bg-white border border-green-300 rounded-2xl shadow-lg p-6">
+      <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
+        Share Your Feedback
+      </h2>
 
-            {/* Delivery Rating */}
-            <div className="mb-6">
-              <p className="text-gray-700 font-medium mb-2">
-                How satisfied are you with the{" "}
-                <span className="text-green-700">delivery</span>?
-              </p>
-              <div className="flex gap-2 text-green-500 text-2xl">
-                <FaStar className="cursor-pointer hover:scale-110 transition" />
-                <FaStar className="cursor-pointer hover:scale-110 transition" />
-                <FaStar className="cursor-pointer hover:scale-110 transition" />
-                <FaStar className="cursor-pointer hover:scale-110 transition" />
-                <FaStar className="cursor-pointer hover:scale-110 transition" />
-              </div>
-            </div>
+      {/* Delivery Rating */}
+      <div className="mb-10">
+        <p className="text-lg font-semibold text-gray-800 mb-4">
+          How satisfied are you with the{" "}
+          <span className="text-green-600">delivery</span>?
+        </p>
 
-            {/* Food Rating */}
-            <div>
-              <p className="text-gray-700 font-medium mb-2">
-                How much did you enjoy the{" "}
-                <span className="text-green-700">food</span>?
-              </p>
-              <div className="flex gap-2 text-green-500 text-2xl">
-                <FaStar className="cursor-pointer hover:scale-110 transition" />
-                <FaStar className="cursor-pointer hover:scale-110 transition" />
-                <FaStar className="cursor-pointer hover:scale-110 transition" />
-                <FaStar className="cursor-pointer hover:scale-110 transition" />
-                <FaStar className="cursor-pointer hover:scale-110 transition" />
-              </div>
-            </div>
-          </div>
+        <div className="flex flex-wrap gap-3">
+          {deliveryRatingRivews.map((val, index) => {
+            const deliveryEmojis = ["😡", "😕", "😐", "😊", "😍"];
+            const isSelected = selectedDelivery === index + 1;
+            return (
+              <button
+                key={index}
+                onClick={() => clientRiview("delivery", index + 1)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-sm text-sm font-medium transition-all duration-300
+                  ${
+                    isSelected
+                      ? "bg-green-600 text-white border border-green-600 shadow-md"
+                      : "bg-white text-green-700 border border-green-300 hover:bg-green-600 hover:text-white"
+                  }`}
+              >
+                <span className="text-lg">{deliveryEmojis[index]}</span> {val}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Food Rating */}
+      <div>
+        <p className="text-lg font-semibold text-gray-800 mb-4">
+          How much did you enjoy the{" "}
+          <span className="text-green-600">food</span>?
+        </p>
+
+        <div className="flex flex-wrap gap-3">
+          {deliveryRatingRivews.map((val, index) => {
+            const foodEmojis = ["🤢", "😒", "😐", "😋", "🤩"];
+            const isSelected = selectedFood === index + 1;
+            return (
+              <button
+                key={index}
+                onClick={() => clientRiview("food", index + 1)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-sm text-sm font-medium transition-all duration-300
+                  ${
+                    isSelected
+                      ? "bg-green-600 text-white border border-green-600 shadow-md"
+                      : "bg-white text-green-700 border border-green-300 hover:bg-green-600 hover:text-white"
+                  }`}
+              >
+                <span className="text-lg">{foodEmojis[index]}</span> {val}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+          )}
         </div>
       ) : (
         <p className="text-center text-gray-600">Loading order status...</p>
