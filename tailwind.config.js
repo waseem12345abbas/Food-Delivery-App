@@ -7,6 +7,17 @@ export default {
   ],
   theme: {
     extend: {
+      colors: {
+        primary: {
+          bg: '#ffffff', // white
+          text: '#000000', // black
+        },
+        secondary: {
+          bg: '#000000', // black
+          text: '#ffffff', // white
+        },
+        accent: '#fbbf24', // yellow-400
+      },
     },
   },
   plugins: [],

@@ -40,7 +40,7 @@ const HeroCarousel = () => {
     setCurrentSlide((prev) => (prev + 1) % todaySpecial.length);
   };
 
-  if (status === 'loading') return <div className="text-center text-light-text dark:text-dark-text">Loading...</div>;
+  if (status === 'loading') return <div className="text-center text-primary-text dark:text-secondary-text">Loading...</div>;
   if (error) return <p className="text-center text-red-500">Error: {error}</p>;
 
   return (
@@ -70,7 +70,7 @@ const HeroCarousel = () => {
             <div className="w-full md:w-1/2 flex flex-col items-center md:items-start justify-center text-center md:text-left p-4">
               <h1 className="text-4xl md:text-6xl font-bold text-black mb-4">{special.name}</h1>
               <h2 className="text-xl md:text-2xl mb-6 text-black font-semibold">
-                ${special.price || special.discountPrice}
+                RS{special.price || special.discountPrice}
               </h2>
               <p className="text-lg text-black md:text-xl mb-8 leading-relaxed max-w-lg">
                 {special.description}

@@ -146,7 +146,7 @@ const AddNewItem = () => {
         step="0.01"
         value={formData.price}
         onChange={handleChange}
-        placeholder="Regular Price ($)"
+        placeholder="Regular Price (RS)"
         className="w-full border focus:border-none rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
         required
       />
@@ -156,7 +156,7 @@ const AddNewItem = () => {
         step="0.01"
         value={formData.discountPrice}
         onChange={handleChange}
-        placeholder="Discount Price ($)"
+        placeholder="Discount Price (RS)"
         className="w-full border focus:border-none rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
       />
     </div>

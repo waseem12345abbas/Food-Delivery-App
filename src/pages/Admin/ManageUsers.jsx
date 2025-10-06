@@ -11,7 +11,6 @@ const ManageUsers = () => {
     dispatch(fetchUsers());
   },[])
   const users = useSelector((state) => state.users.users);
-  console.log("Users = ", users)
   const [blocked, setBlocked]=useState(null)
   // block a user
   function handleBlock(user){
@@ -35,6 +34,7 @@ const ManageUsers = () => {
                 <th className="px-6 py-3 font-semibold uppercase">Email</th>
                 <th className="px-6 py-3 font-semibold uppercase">Contact</th>
                 <th className="px-6 py-3 font-semibold uppercase">Address</th>
+                <th className="px-6 py-3 font-semibold uppercase">Rank</th>
                 <th className='px-6 py-3 font-semibold uppercase'>Action</th>
               </tr>
             </thead>
@@ -42,15 +42,16 @@ const ManageUsers = () => {
               {
                 users.map((user)=>(
             <tr key={user._id} className="border-b border-gray-300">
-                <td className="px-6 py-4">{user.name}</td>
-                <td className="px-6 py-4">{user.email}</td>
-                <td className="px-6 py-4">{user.mobile}</td>
-                <td className="px-6 py-4">{user.address}</td>
+                <td className="px-6 py-4">{user?.name}</td>
+                <td className="px-6 py-4">{user?.email}</td>
+                <td className="px-6 py-4">{user?.mobile}</td>
+                <td className="px-6 py-4">{user?.address}</td>
+                <td className='px-6 py-4'>{user?.rank}</td>
                 <td className='px-6 py-4'>
                 <button
                 onClick={()=>handleBlock(user)}
-                className={`'border rounded ${blocked===user._id? 'bg-black hover:cursor-not-allowed text-white':'bg-black cursor-pointer text-red-700'} px-3 py-2 `}>
-                  {blocked === user._id ? ' Blocked' : 'Block'}
+                className={`'border rounded ${blocked===user?._id? 'bg-black hover:cursor-not-allowed text-white':'bg-black cursor-pointer text-red-700'} px-3 py-2 `}>
+                  {blocked === user?._id ? ' Blocked' : 'Block'}
                 </button>
                 </td>
             </tr>

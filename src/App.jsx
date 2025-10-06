@@ -89,16 +89,16 @@ function App({ children }) {
   })
   useEffect(()=>{
     if(darkMode){
-      root.classList.add("dark");
+      document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark")
     }else{
-      root.classList.remove("dark")
+      document.documentElement.classList.remove("dark")
       localStorage.setItem("theme", "light")
     }
   },[darkMode])
 
   return (
-    <div className={`${darkMode ? 'dark':''} bg-white overflow-hidden`}>
+    <div className="bg-primary-bg dark:bg-secondary-bg overflow-hidden">
       <BrowserRouter>
       <AuthProvider>
           <Layout toggleTheme={()=> setDarkMode(!darkMode)} darkMode={darkMode}/>

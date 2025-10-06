@@ -92,7 +92,7 @@ const DiscountProducts = () => {
                     <div>
                       <div className="flex items-center justify-between">
                         <span className="text-black  qtext-sm">
-                          ${product.price}
+                          RS{product.price}
                         </span>
                          <button
                         onClick={() => dispatch(addToCart(product))}

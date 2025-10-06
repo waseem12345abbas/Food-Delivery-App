@@ -68,7 +68,7 @@ export default function OrderStatus() {
               setOrderId(_id);
 
               const resOrderDetails = await api.get(`/api/order/${_id}`);
-              setOrder(resOrderDetails.data);
+              setOrder(resOrderDetails.data.data);
 
               socket.emit("joinOrder", _id);
               socket.on("orderUpdated", (updatedOrder) =>

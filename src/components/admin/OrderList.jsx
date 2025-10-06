@@ -79,7 +79,7 @@ const OrderList = () => {
                     ))}
                   </td>
                   <td className="px-6 py-4 text-gray-700 text-nowrap">
-                    $
+                    RS
                     {order.cartItems
                       ?.reduce(
                         (total, i) => total + i.itemPrice * i.itemQuantity,

@@ -23,7 +23,6 @@ const ManageMenu = () => {
       "Are you sure you want to delete this item."
     );
     if (confirmed) {
-      console.log(`Deleting item with id: ${id}`);
       dispatch(deleteProduct(id))
     }
   };
@@ -68,7 +67,7 @@ const ManageMenu = () => {
             <tr key={item._id}>
               <td className="border-r px-4 py-2">{item._id}</td>
               <td className="border-r px-4 py-2">{item.name}</td>
-              <td className="border-r px-4 py-2">${item.price}</td>
+              <td className="border-r px-4 py-2">RS{item.price}</td>
               <td className="border-r px-4 py-2">{item.category}</td>
               <td className="border-r px-4 py-2"> { item.image ? <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded"/>:'no image found'}</td>
               <td className="px-4 py-2 space-x-2 space-y-2 md:space-y-1">

@@ -102,7 +102,7 @@ const Cart = () => {
                     </p>
                   </div>
                   <p className="font-semibold">
-                    ${(item.discountPrice || item.price) * item.quantity}
+                    RS{(item.discountPrice || item.price) * item.quantity}
                   </p>
                 </li>
               ))}
@@ -110,12 +110,12 @@ const Cart = () => {
             <div className="flex items-center justify-between py-3">
               <span className="text-base font-semibold">Delivery Fee</span>
               <span className="pr-2 font-semibold">
-                ${deliveryFee.toFixed(2)}
+                RS{deliveryFee.toFixed(2)}
               </span>
             </div>
             <div className="border-t mt-6 pt-4 flex justify-between text-lg font-bold">
               <span>Total:</span>
-              <span>${totalPrice.toFixed(2)}</span>
+              <span>RS{totalPrice.toFixed(2)}</span>
             </div>
 
             <button

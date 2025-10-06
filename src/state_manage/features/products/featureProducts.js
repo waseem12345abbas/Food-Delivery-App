@@ -8,9 +8,7 @@ export const fetchFeatureProducts = createAsyncThunk(
     async (_, { rejectWithValue})=>{
         try {
             const res = await api.get('/api/bestSellingProducts');
-            console.log("fetchFeatureProducts response data:", res.data);
             if(res.data.success){
-                console.log("fetchFeatureProducts data:", res.data.data);
                 return res.data.data;
             }else{
                 return rejectWithValue("APi returned unsuccessful response");

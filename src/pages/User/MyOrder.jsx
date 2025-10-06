@@ -15,26 +15,24 @@ const MyOrder = () => {
         const userType = sessionStorage.getItem("userType");
         const userData = sessionStorage.getItem("userData");
 
-        if (userType === "guest" && userData) {
-          // For guest users, parse guest data and fetch orders by guest email
-          const guestUser = JSON.parse(userData);
-          const guestEmail = guestUser.email;
-          console.log("GGGGGGGGGGGGGGGG = ", guestEmail)
-          if (guestEmail) {
-            // Fetch orders by guest email
-            const orderRes = await api.get(`/api/orders/${guestEmail}`);
-            console.log("JJJJJJJJJJJJJJJJ = ", orderRes.data.data)
-            setOrders(orderRes.data.data || []);
+          if (userType === "guest" && userData) {
+            // For guest users, parse guest data and fetch orders by guest email
+            const guestUser = JSON.parse(userData);
+            const guestEmail = guestUser.email;
+            if (guestEmail) {
+              // Fetch orders by guest email
+              const orderRes = await api.get(`/api/orders/${guestEmail}`);
+              setOrders(orderRes.data.data || []);
+            }
+          } else {
+            // For authenticated users, fetch profile and then orders
+            const res = await api.get("/api/profile");
+            const email = res.data.email;
+            if (email) {
+              const orderRes = await api.get(`/api/orders/${email}`);
+              setOrders(orderRes.data.data || []);
+            }
           }
-        } else {
-          // For authenticated users, fetch profile and then orders
-          const res = await api.get("/api/profile");
-          const email = res.data.email;
-          if (email) {
-            const orderRes = await api.get(`/api/orders/${email}`);
-            setOrders(orderRes.data.data || []);
-          }
-        }
       } catch (error) {
         console.error("Error fetching orders:", error);
         // For guest users, if the API fails, show empty orders
@@ -151,7 +149,7 @@ const MyOrder = () => {
                     >
                       <span>{item.itemName}</span>
                       <span className="font-medium">
-                        {item.itemQuantity} × ${item.itemPrice}
+                        {item.itemQuantity} × RS{item.itemPrice}
                       </span>
                     </motion.li>
                   ))}

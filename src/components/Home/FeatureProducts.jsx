@@ -14,9 +14,8 @@ import { Navigation, Pagination, Autoplay } from "swiper/modules";
 const FeatureProducts = () => {
   const dispatch = useDispatch();
 
-  // all items in the cart
+// all items in the cart
 const allItemsInCart = useSelector((state)=>state.cart.cart);
-console.log("allItemsInCart:", allItemsInCart);
 // check if item is in the cart
 const isItemInCart = (id) => allItemsInCart.some((item) => String(item._id) === String(id)); 
 
@@ -100,7 +99,7 @@ const isItemInCart = (id) => allItemsInCart.some((item) => String(item._id) === 
                     {popular._id.name}
                   </span>
                   <span className="text-black text-sm">
-                    ${popular._id.price}
+                    RS{popular._id.price}
                   </span>
                   </div>
                   <button

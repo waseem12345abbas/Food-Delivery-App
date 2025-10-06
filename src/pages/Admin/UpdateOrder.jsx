@@ -34,7 +34,6 @@ export default function UpdateOrder() {
     try {
       const ress = await api.get(`/api/order/${inputPaymentId}`);
       setOrder(ress.data.data);
-      console.log("RRRRRRRRRRRRRRr = ", ress.data.data._id);
       setStages(ress.data.stages || []);
       setTimer(ress.data.timer || { startTime: "", endTime: "" });
       setOrderId(ress.data.data._id);
@@ -123,12 +122,10 @@ export default function UpdateOrder() {
       riderNumber: riderDetailsForm.rNum,
       riderLocation: riderDetailsForm.rLocation,
     };
-    console.log("Updating rider details with payload:", riderDetails);
     try {
       const response = await api.put(`/api/orders/${orderId}`, {
         riderDetails,
       });
-      console.log("Rider update response:", response);
       setMessage("Order Updated Successfully");
       setRider(false); // Close rider section after success
       setRiderDetailsForm({

@@ -6,7 +6,6 @@ import Header from "./Header";
 
 const Navbar = ({ toggleTheme, darkMode }) => {
   const itemsLength = useSelector((state) => state.cart.cart);
-  console.log(itemsLength.length);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
