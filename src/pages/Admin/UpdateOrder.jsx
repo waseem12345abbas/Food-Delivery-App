@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import api from "../../api";
+import { usePopup } from "../../components/hooks/usePopUp";
+import Popup from "../../components/PopUp";
 
 export default function UpdateOrder() {
   const [order, setOrder] = useState(null);
@@ -8,8 +10,6 @@ export default function UpdateOrder() {
   const [timer, setTimer] = useState({ startTime: "", endTime: "" });
   const [orderId, setOrderId] = useState(null);
   const [inputPaymentId, setInputPaymentId] = useState("");
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [socket, setSocket] = useState(null);
   const [rider, setRider] = useState(null);
@@ -18,6 +18,8 @@ export default function UpdateOrder() {
     rNum: "",
     rLocation: "",
   });
+
+  const { popup, showPopup, hidePopup } = usePopup();
 
   useEffect(() => {
     const newSocket = io("http://localhost:5000");
@@ -29,7 +31,6 @@ export default function UpdateOrder() {
   const fetchOrderById = async () => {
     if (!inputPaymentId.trim()) return;
     setLoading(true);
-    setError("");
     // trying to fetch order
     try {
       const ress = await api.get(`/api/order/${inputPaymentId}`);
@@ -39,8 +40,9 @@ export default function UpdateOrder() {
       setOrderId(ress.data.data._id);
     } catch (error) {
       // if order is not fetched then response error message
-      setError(
-        error.response?.data?.message || error.message || "An error occurred"
+      showPopup(
+        error.response?.data?.message || error.message || "An error occurred",
+        "error"
       );
       setOrder(null);
       setStages([]);
@@ -63,13 +65,6 @@ export default function UpdateOrder() {
 
     return () => socket.off("orderUpdated");
   }, [socket, orderId]);
-  // show stage update message when any stage is updated runs each time when message is changed
-  useEffect(() => {
-    if (message) {
-      const timer = setTimeout(() => setMessage(""), 3000);
-      return () => clearTimeout(timer); 
-    }
-  }, [message]);
 
   //  take the original stage and update with new stage in previous stages array
   const updateStage = (index, field, value) => {
@@ -91,8 +86,8 @@ export default function UpdateOrder() {
         stages,
         timer,
       })
-      .then(() => setMessage("Order updated successfully"))
-      .catch((err) => setError(err));
+      .then(() => showPopup("Order updated successfully", "success"))
+      .catch((err) => showPopup(err.message || "Failed to update order", "error"));
   };
 
   // clear or delete the stages from the order
@@ -109,9 +104,9 @@ export default function UpdateOrder() {
         });
         setStages([]);
         setTimer({ startTime: "", endTime: "" });
-        setMessage("Stages cleared successfully");
+        showPopup("Stages cleared successfully", "success");
       } catch (error) {
-        setMessage("Error clearing stages");
+        showPopup("Error clearing stages", "error");
       }
     }
   };
@@ -126,7 +121,7 @@ export default function UpdateOrder() {
       const response = await api.put(`/api/orders/${orderId}`, {
         riderDetails,
       });
-      setMessage("Order Updated Successfully");
+      showPopup("Order Updated Successfully", "success");
       setRider(false); // Close rider section after success
       setRiderDetailsForm({
         rName: "",
@@ -135,7 +130,7 @@ export default function UpdateOrder() {
       });
     } catch (err) {
       console.error("Rider update error:", err.response || err);
-      setError(err.response?.data?.message || err.message || "Failed to update rider");
+      showPopup(err.response?.data?.message || err.message || "Failed to update rider", "error");
     }
   };
   // handleRider will collect rider details
@@ -176,13 +171,6 @@ export default function UpdateOrder() {
         )}
       </div>
 
-      {/* Error / Info Message */}
-      {error && (
-        <div className="text-center bg-red-100 px-4 py-3 rounded-xl text-red-700 font-semibold mb-4 shadow">
-          {error}
-        </div>
-      )}
-
       {!order && !loading && (
         <div className="text-center bg-yellow-100 rounded-xl px-4 py-3 text-yellow-800 font-semibold shadow mb-4">
           Enter a Payment ID and click Fetch Order to load the order details.
@@ -207,12 +195,6 @@ export default function UpdateOrder() {
               <span className="text-gray-800 font-medium">{order?._id}</span>
             </h3>
           </div>
-
-          {message && (
-            <div className="text-center bg-green-100 px-4 py-3 rounded-xl text-green-700 font-semibold mb-4 shadow">
-              {message}
-            </div>
-          )}
 
           {/* Stages */}
           <h2 className="text-2xl font-bold text-gray-800 mb-3">
@@ -359,6 +341,7 @@ export default function UpdateOrder() {
           )}
         </>
       )}
+      <Popup popup={popup} hidePopup={hidePopup} />
     </div>
   );
 }

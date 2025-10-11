@@ -53,4 +53,12 @@ export default defineConfig({
       },
     }),
     react()],
+  server: {
+    proxy: {
+      '/uploads': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+    },
+  },
 })

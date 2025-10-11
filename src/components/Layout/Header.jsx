@@ -1,71 +1,153 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { FaSearch, FaMapMarkedAlt, FaChevronDown } from "react-icons/fa";
+import { FaMapMarkedAlt, FaChevronDown, FaBars, FaShoppingCart } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import Navbar from "./Navbar"; // ✅ Import Navbar
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const Header = ({ toggleTheme, darkMode }) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [ isLocationOpen, setIsLocationOpen] = useState(null)
+  const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [location, setLocation] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false); // ✅ Control sidebar
+  const itemsLength = useSelector((state) => state.cart.cart);
+
+  const handleGetLocation = async () => {
+    setLoading(true);
+    setError(null);
+    if (!navigator.geolocation) {
+      setError("Geolocation not supported by your browser.");
+      setLoading(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+          );
+          const data = await res.json();
+          setLocation(data.display_name || "Location found");
+        } catch {
+          setError("Unable to fetch location name.");
+        }
+        setLoading(false);
+      },
+      () => {
+        setError("Permission denied or unable to get location.");
+        setLoading(false);
+      }
+    );
+  };
 
   return (
-    <div className="bg-yellow-400 shadow-lg  top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-15">
-        <div className="flex flex-row justify-between items-center py-3 gap-4 sm:gap-0">
+    <>
+      {/* Header Section */}
+      <header className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-black text-white shadow-xl sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center gap-4">
 
-          {/* Careers Link */}
-          <motion.div whileHover={{ scale: 1.05 }} className="hidden md:block">
-            <Link className="text-md font-medium text-black transition-colors" to={"/careers"}>
-              Careers
-            </Link>
-          </motion.div>
-
-          {/* Search Bar */}
-          <motion.div whileHover={{ scale: 1.02 }} className="hidden md:block relative w-full sm:w-auto sm:max-w-md mx-4">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FaSearch className="h-4 w-4 text-black" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search restaurants or food..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="placeholder-black block w-full pl-10 pr-3 py-2 shadow-md shadow-yellow-400 border border-yellow-400 rounded-full bg-white focus:outline-none focus:ring-1 focus:ring-secondary focus:border-transparent text-sm text-black"
-            />
-          </motion.div>
-
-          {/* Location Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setIsLocationOpen(!isLocationOpen)}
-              className="flex items-center gap-2 text-black transition-colors"
-            >
-              <FaMapMarkedAlt className="h-4 w-4 text-red-500" />
-              <span className="text-sm font-medium">My Location</span>
-              <FaChevronDown
-                className={`h-3 w-3 transition-transform ${isLocationOpen ? "rotate-180" : ""}`}
-              />
-            </button>
-          </div>
-
-          {/* Profile Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="hover:scale-110 w-20 px-4 py-2 rounded-lg bg-white text-black border border-yellow-300 shadow-lg transition cursor-pointer text-medium text-sm"
+          {/* Left: Logo */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center gap-3"
           >
-            <Link to={"/profile"}>Profile</Link>
+            <img
+              src="/logo/joyfultable.png"
+              alt="Logo"
+              className="h-10 w-auto rounded-md shadow-md"
+            />
+            <h1 className="text-lg md:text-xl font-bold tracking-wide">
+              Joyful Table
+            </h1>
+          </motion.div>
+
+          {/* Center: Location */}
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              setIsLocationOpen(!isLocationOpen);
+              if (!location) handleGetLocation();
+            }}
+            className="flex items-center gap-2 bg-black/30 hover:bg-black/50 transition-all px-4 py-2 rounded-full shadow-md backdrop-blur-sm"
+          >
+            <FaMapMarkedAlt className="text-yellow-300 text-lg" />
+            <span className="text-sm truncate w-28 md:w-40 text-left">
+              {location ? location.split(",")[0] : "My Location"}
+            </span>
+            <FaChevronDown
+              className={`text-xs transition-transform ${isLocationOpen ? "rotate-180" : ""}`}
+            />
           </motion.button>
 
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="hover:scale-110 w-20 px-4 py-2 rounded-lg bg-white text-black border border-yellow-300 shadow-lg transition cursor-pointer text-medium text-sm"
-          >
-            {darkMode ? "Light" : "Dark"}
-          </button>
+         {/* Right: Menu & Cart */}
+<div className="flex items-center gap-4">
+  {/* Cart Icon */}
+  <Link
+    to="/cart"
+    className="relative flex items-center justify-center p-2 rounded-full bg-gradient-to-r from-yellow-300 to-yellow-500 text-black hover:shadow-lg hover:scale-105 transition-all duration-300"
+  >
+    <FaShoppingCart size={20} />
+    <span className="absolute -top-2 -right-2 bg-black text-yellow-300 text-xs rounded-full px-[6px] font-bold shadow-md">
+      {itemsLength.length > 0 ? itemsLength.length : 0}
+    </span>
+  </Link>
+
+  {/* Menu Icon */}
+  <motion.button
+    whileHover={{ scale: 1.1 }}
+    whileTap={{ scale: 0.95 }}
+    onClick={() => setMenuOpen(true)}
+    className="flex items-center justify-center p-2 rounded-full border border-yellow-400 bg-gradient-to-br from-black to-gray-800 text-yellow-300 hover:bg-gradient-to-t hover:shadow-lg transition-all duration-300"
+  >
+    <FaBars size={20} />
+  </motion.button>
+</div>
+
         </div>
-      </div>
-    </div>
+
+        {/* Location Modal */}
+        <AnimatePresence>
+          {isLocationOpen && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-[60]"
+              onClick={() => setIsLocationOpen(false)}
+            >
+              <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 20, opacity: 0 }}
+                className="bg-white text-black p-6 rounded-2xl shadow-2xl w-80 text-center"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {loading ? (
+                  <p className="text-gray-600">Fetching location...</p>
+                ) : error ? (
+                  <p className="text-red-500">{error}</p>
+                ) : location ? (
+                  <>
+                    <h2 className="text-lg font-semibold mb-2">Your Location:</h2>
+                    <p className="text-gray-700 text-sm">{location}</p>
+                  </>
+                ) : (
+                  <p className="text-gray-500">Click to detect your location.</p>
+                )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+
+      {/* Sidebar Navbar */}
+      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+    </>
   );
 };
 

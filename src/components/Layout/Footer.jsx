@@ -4,52 +4,97 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-yellow-400 text-black pt-10 pb-6 px-4 md:px-16 shadow-lg border-t-2 border-yellow-500">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 border-b border-black pb-8">
+    <footer className="relative bg-gradient-to-br from-yellow-400 via-yellow-500 to-black text-white pt-10 pb-6 px-6 md:px-16 overflow-hidden">
+      {/* Glassy overlay */}
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+
+      <div className="relative max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 border-b border-white/20 pb-10">
         {/* Brand */}
         <div>
-          <h2 className="text-2xl font-bold text-black mb-3">SROMS</h2>
-          <p className="text-sm text-yellow-400">
-            Smart Restaurant Ordering & Management System. Order food anytime, anywhere — fresh and fast!
+          <h2 className="text-3xl font-extrabold tracking-wide mb-3 text-[#FFD700] drop-shadow-md">
+            JOYFUL TABLE
+          </h2>
+          <p className="text-sm text-[#FFF8E7] leading-relaxed">
+            Smart Restaurant Ordering & Management System. Order food anytime,
+            anywhere — fresh and fast!
           </p>
         </div>
 
         {/* Quick Links */}
         <div>
-          <h3 className="text-lg font-semibold mb-3">Quick Links</h3>
-          <ul className="space-y-2 text-sm text-black">
-            <li><Link to="/home" className="hover:text-primary transition">Home</Link></li>
-            <li><Link to="/special-offers" className="hover:text-primary transition">Special Offers</Link></li>
-            <li><Link to="/privacy-policy" className="hover:text-primary transition">Privacy Policy</Link></li>
-            <li><Link to="/contact" className="hover:text-primary transition">Contact</Link></li>
+          <h3 className="text-lg font-semibold mb-4 text-[#FDE68A] border-b border-yellow-400 inline-block pb-1">
+            Quick Links
+          </h3>
+          <ul className="space-y-2 text-sm text-[#FFF8E7]">
+            {[
+              { name: "Home", path: "/home" },
+              { name: "Special Offers", path: "/special-offers" },
+              { name: "Privacy Policy", path: "/privacy-policy" },
+              { name: "Contact", path: "/contact" },
+              { name: "Careers", path: "/careers" },
+            ].map((link) => (
+              <li key={link.name}>
+                <Link
+                  to={link.path}
+                  className="hover:text-[#FFD700] transition duration-300"
+                >
+                  {link.name}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
         {/* Contact Info */}
         <div>
-          <h3 className="text-lg font-semibold mb-3">Contact</h3>
-          <ul className="text-sm text-black space-y-2">
-            <li>Email: support@sroms.com</li>
-            <li>Phone: +92 300 1234567</li>
-            <li>Address: Lahore, Pakistan</li>
+          <h3 className="text-lg font-semibold mb-4 text-[#FDE68A] border-b border-yellow-400 inline-block pb-1">
+            Contact
+          </h3>
+          <ul className="text-sm text-[#FFF8E7] space-y-2">
+            <li>
+              <span className="text-[#FFD700] font-medium">Email:</span>{" "}
+              support@sroms.com
+            </li>
+            <li>
+              <span className="text-[#FFD700] font-medium">Phone:</span> +92 300
+              1234567
+            </li>
+            <li>
+              <span className="text-[#FFD700] font-medium">Address:</span>{" "}
+              Lahore, Pakistan
+            </li>
           </ul>
         </div>
 
         {/* Social Media */}
         <div>
-          <h3 className="text-lg font-semibold mb-3">Follow Us</h3>
-          <div className="flex space-x-4">
-            <a href="#" className="hover:text-primary text-xl transition"><FaFacebookF /></a>
-            <a href="#" className="hover:text-primary text-xl transition"><FaInstagram /></a>
-            <a href="#" className="hover:text-primary text-xl transition"><FaTwitter /></a>
-            <a href="#" className="hover:text-primary text-xl transition"><FaYoutube /></a>
+          <h3 className="text-lg font-semibold mb-4 text-[#FDE68A] border-b border-yellow-400 inline-block pb-1">
+            Follow Us
+          </h3>
+          <div className="flex space-x-5">
+            {[
+              { icon: <FaFacebookF />, link: "#" },
+              { icon: <FaInstagram />, link: "#" },
+              { icon: <FaTwitter />, link: "#" },
+              { icon: <FaYoutube />, link: "#" },
+            ].map((social, index) => (
+              <a
+                key={index}
+                href={social.link}
+                className="text-2xl text-[#FFF8E7] hover:text-[#FFD700] hover:scale-110 transform transition duration-300"
+              >
+                {social.icon}
+              </a>
+            ))}
           </div>
         </div>
       </div>
 
       {/* Bottom Text */}
-      <div className="text-center text-sm text-black pt-6">
-        &copy; {new Date().getFullYear()} SROMS. All rights reserved.
+      <div className="relative text-center text-sm text-[#FFF8E7] pt-6 tracking-wide">
+        &copy; {new Date().getFullYear()}{" "}
+        <span className="text-[#FFD700] font-semibold">Joyful Table</span>. All
+        rights reserved.
       </div>
     </footer>
   );

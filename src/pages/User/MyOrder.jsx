@@ -74,15 +74,38 @@ const MyOrder = () => {
         My Orders
       </motion.h1>
 
-      {orders.length === 0 ? (
-        <motion.p
-          className="text-center text-gray-600 text-lg mt-20"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          You have no orders yet.
-        </motion.p>
-      ) : (
+     {orders.length === 0 ? (
+  <motion.div
+    className="flex flex-col items-center justify-center py-20 bg-gradient-to-b from-yellow-50 to-yellow-200 rounded-2xl shadow-md max-w-md mx-auto mt-10"
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 0.6 }}
+  >
+    <motion.img
+      src="https://cdn-icons-png.flaticon.com/512/706/706164.png"
+      alt="No Orders"
+      className="w-40 h-40 mb-6 animate-bounce-slow"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3 }}
+    />
+
+    <h2 className="text-2xl font-bold text-black mb-2">
+      No Orders Yet!
+    </h2>
+    <p className="text-gray-700 text-center mb-6 px-6">
+      Looks like you haven’t ordered anything yet.  
+      Discover mouthwatering dishes and place your first order today!
+    </p>
+
+    <Link
+      to="/"
+      className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105"
+    >
+      Explore Menu
+    </Link>
+  </motion.div>
+) : (
         <motion.div
           className="space-y-6"
           initial="hidden"

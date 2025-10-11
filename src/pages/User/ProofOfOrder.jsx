@@ -70,9 +70,9 @@ const ProofOfOrder = () => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, payAtCounterParam = false) => {
     if (e) e.preventDefault();
-    if (userSession.serviceType === "dine-in" && payAtCounter) {
+    if (userSession.serviceType === "dine-in" && payAtCounterParam) {
       // No validation needed, proceed directly
       const success = await submitOrder();
       if (success) {
@@ -212,11 +212,7 @@ const ProofOfOrder = () => {
         userSession.serviceType === "dine-in" && (
       <div className="mt-6 text-center">
         <button
-        onClick={()=>
-          {
-            setPayAtCounter(true);
-            handleSubmit()}
-        }
+        onClick={()=>handleSubmit(null, true)}
         className="px-4 py-2 text-center rounded-md bg-black text-yellow-500">
           Pay At Counter
         </button>

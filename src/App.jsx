@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import "./App.css";
-import Navbar from "./components/Layout/Navbar";
+import Header from "./components/Layout/Header";
 import HomePage from "./pages/User/HomePage";
 import Footer from "./components/Layout/Footer";
 import ContactPage from "./pages/User/ContactPage";
@@ -38,7 +38,7 @@ function Layout({ toggleTheme, darkMode }) {
   ["/login","/register","/","/login-or-guest"].includes(location.pathname);
   return (
     <>
-      {!hideNavbarFooter && <Navbar toggleTheme={toggleTheme} darkMode={darkMode} />}
+      {!hideNavbarFooter && <Header toggleTheme={toggleTheme} darkMode={darkMode} />}
       <Routes>
         {<Route path="/" element={<StartOver />} />}
         <Route path="/contact" element={<ContactPage />} />

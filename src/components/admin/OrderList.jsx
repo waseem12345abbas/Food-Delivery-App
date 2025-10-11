@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import api from "../../api";
+import { usePopup } from "../hooks/usePopUp";
+import Popup from "../PopUp";
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState("")
-  const fetchOrders = async (req, res) => {
+
+ const { popup, showPopup, hidePopup } = usePopup();
+
+  const fetchOrders = async () => {
     try {
       const res = await api.get("/api/allOrders");
       setOrders(res.data.data);
     } catch (err) {
       setError(err.message);
+      showPopup("Failed to fetch orders", "error")
     }
   };
   // fetch orders
@@ -27,26 +32,23 @@ const OrderList = () => {
       // send update in the backend
       const ress = await api.put(`/api/updateOrderStatus/${id}`, { status: newStatus });
       if(ress.status === 200){
-        setMessage(ress.data.message || "Order updated successfully")
+        showPopup("Order updated successfully!", "success")
       }
     } catch (error) {
-      alert("Faild to update please try again. Or Login");
+      showPopup("Failed to update. Please login again.", "error")
     }
   };
-  // set timer and remove timer
-  useEffect(()=>{
-    if(message){
-      const timer =setTimeout(()=>setMessage(""), 2000)
-      return ()=>clearTimeout(timer)
-    }
-  },[message])
   return (
     <div className="p-8 bg-white min-h-screen">
       <h1 className="text-3xl text-center font-bold text-black mb-6">Orders</h1>
-    
-      {message && (
-        <div className="my-4 rounded-md bg-green-300"><h2 className="pl-2 py-4 text-black font-medium">{message}</h2></div>
-      )}
+      {/* a pop up to show message */}
+      <Popup 
+      show={popup.show}
+      message={popup.message}
+      type={popup.type}
+      onClose={hidePopup}
+      />
+
       <div className="overflow-x-auto rounded-lg shadow-lg">
         <table className="min-w-full text-sm">
           <thead className="bg-black text-white">
@@ -69,8 +71,8 @@ const OrderList = () => {
               </div>
             ) : (
               orders &&
-              orders.map((order) => (
-                <tr key={order._id} className="border-b">
+              orders.map((order, index) => (
+                <tr key={`${order._id}-${index}`} className="border-b">
                   <td className="px-6 py-4 text-black">{order._id}</td>
                   <td className="px-6 py-4 text-black">{order.userName}</td>
                   <td className="px-6 py-4 text-black">

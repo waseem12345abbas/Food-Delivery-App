@@ -2,6 +2,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { removeToCart, addToCart, decreaseQuantity } from "../../state_manage/features/cart/Cart";
 import { useNavigate } from "react-router-dom";
 import { FaTimes, FaMinus, FaPlus } from "react-icons/fa";
+
+
 const Cart = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.cart);
@@ -33,10 +35,27 @@ const Cart = () => {
       </h1>
 
       {cartItems.length === 0 ? (
-        <p className="text-center text-black text-lg py-10">
-          Your cart is empty.
-        </p>
-      ) : (
+  <div className="flex flex-col items-center justify-center py-20 bg-gradient-to-b from-yellow-100 to-yellow-200 rounded-xl shadow-md mx-auto max-w-md">
+    <img
+      src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
+      alt="Empty Cart"
+      className="w-40 h-40 mb-6 animate-bounce-slow"
+    />
+    <h2 className="text-2xl font-bold text-black mb-2">Your Cart is Empty!</h2>
+    <p className="text-gray-700 text-center mb-6 px-6">
+      Looks like you haven’t added anything yet.  
+      Explore our delicious menu and add your favorite items!
+    </p>
+    <button
+      onClick={() => navigate("/home")}
+      className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105"
+    >
+      Browse Menu
+    </button>
+  </div>
+) : (
+  // your existing cart display section
+
         <div className="flex flex-col md:flex-row rounded-md shadow-md shadow-neutral-500 rounded-lg bg-neutral-100">
           <div className="flex-2 flex flex-col">
             {cartItems.map((item) => (
