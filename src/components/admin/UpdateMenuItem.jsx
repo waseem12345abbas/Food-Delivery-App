@@ -1,4 +1,16 @@
 import React, { useState, useEffect } from "react";
+import {
+  FaUtensils,
+  FaTags,
+  FaImage,
+  FaDollarSign,
+  FaLeaf,
+  FaFire,
+  FaClock,
+  FaTimesCircle,
+  FaCheckCircle,
+  FaEye,
+} from "react-icons/fa";
 
 const UpdateMenuItem = ({ item, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -11,12 +23,12 @@ const UpdateMenuItem = ({ item, onClose, onUpdate }) => {
     calories: "",
     isVegetarian: false,
     isAvailable: true,
-    isFeatured: false,
     isTodaysDeal: false,
     dealExpiresAt: "",
-    rating: { average: 0, count: 0 },
     image: "",
   });
+
+  const [viewImage, setViewImage] = useState(false);
 
   useEffect(() => {
     if (item) {
@@ -30,36 +42,28 @@ const UpdateMenuItem = ({ item, onClose, onUpdate }) => {
         calories: item.calories || "",
         isVegetarian: item.isVegetarian || false,
         isAvailable: item.isAvailable || true,
-        isFeatured: item.isFeatured || false,
         isTodaysDeal: item.isTodaysDeal || false,
-        dealExpiresAt: item.dealExpiresAt ? item.dealExpiresAt.substring(0,10) : "",
-        rating: item.rating || { average: 0, count: 0 },
+        dealExpiresAt: item.dealExpiresAt
+          ? item.dealExpiresAt.substring(0, 10)
+          : "",
         image: item.image || "",
       });
     }
   }, [item]);
 
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  })
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (name === "average" || name === "count") {
-      setFormData((prev) => ({
-        ...prev,
-        rating: {
-          ...prev.rating,
-          [name]: type === "checkbox" ? checked : parseFloat(value),
-        },
-      }));
-    } else if (type === "checkbox") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: checked,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -68,169 +72,228 @@ const UpdateMenuItem = ({ item, onClose, onUpdate }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-md w-full max-w-2xl overflow-auto max-h-full shadow-lg border border-black">
-        <h2 className="text-2xl font-bold mb-4 text-black">Update Menu Item</h2>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
-          <input
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Item Name"
-            required
-            className="border border-black p-2 rounded bg-white text-black"
-          />
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Description"
-            rows={3}
-            required
-            className="border border-black p-2 rounded bg-white text-black"
-          />
-          <input
-            name="price"
-            type="number"
-            step="0.01"
-            value={formData.price}
-            onChange={handleChange}
-            placeholder="Price"
-            required
-            className="border border-black p-2 rounded bg-white text-black"
-          />
-          <input
-            name="discountPrice"
-            type="number"
-            step="0.01"
-            value={formData.discountPrice}
-            onChange={handleChange}
-            placeholder="Discount Price"
-            className="border border-black p-2 rounded bg-white text-black"
-          />
-          <input
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            placeholder="Category"
-            required
-            className="border border-black p-2 rounded bg-white text-black"
-          />
-          <input
-            name="subCategory"
-            value={formData.subCategory}
-            onChange={handleChange}
-            placeholder="Sub Category"
-            className="border border-black p-2 rounded bg-white text-black"
-          />
-          <input
-            name="calories"
-            type="number"
-            value={formData.calories}
-            onChange={handleChange}
-            placeholder="Calories"
-            className="border border-black p-2 rounded bg-white text-black"
-          />
-          <input
-            name="image"
-            value={formData.image}
-            onChange={handleChange}
-            placeholder="Image URL"
-            className="border border-black p-2 rounded bg-white text-black"
-          />
-          <div className="flex space-x-4">
-            <label className="flex items-center space-x-2 text-black">
+    <>
+      {/* Background overlay */}
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center overflow-auto items-start z-50 py-10">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-3xl relative border border-yellow-100 animate-fadeIn mt-1 ">
+          <h2 className="text-3xl font-extrabold text-yellow-700 mb-6 text-center flex items-center justify-center gap-2">
+            <FaUtensils className="text-yellow-600" /> Update Menu Item
+          </h2>
+
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Name */}
+            <div>
+              <label className="font-semibold flex items-center gap-2 text-gray-700">
+                <FaUtensils className="text-yellow-600" /> Item Name
+              </label>
               <input
-                type="checkbox"
-                name="isVegetarian"
-                checked={formData.isVegetarian}
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
-                className="border border-black"
+                placeholder="Enter name"
+                required
+                className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-yellow-500 mt-1 shadow-sm"
               />
-              <span>Vegetarian</span>
-            </label>
-            <label className="flex items-center space-x-2 text-black">
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="font-semibold flex items-center gap-2 text-gray-700">
+                <FaTags className="text-yellow-600" /> Category
+              </label>
               <input
-                type="checkbox"
-                name="isAvailable"
-                checked={formData.isAvailable}
+                name="category"
+                value={formData.category}
                 onChange={handleChange}
-                className="border border-black"
+                placeholder="Category (e.g., Burger)"
+                required
+                className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-yellow-500 mt-1 shadow-sm"
               />
-              <span>Available</span>
-            </label>
-          </div>
-          <div className="flex space-x-4">
-            <label className="flex items-center space-x-2 text-black">
+            </div>
+
+            {/* Sub Category */}
+            <div>
+              <label className="font-semibold text-gray-700">Sub Category</label>
               <input
-                type="checkbox"
-                name="isFeatured"
-                checked={formData.isFeatured}
+                name="subCategory"
+                value={formData.subCategory}
                 onChange={handleChange}
-                className="border border-black"
+                placeholder="Sub Category (e.g., Chicken)"
+                className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-yellow-500 mt-1 shadow-sm"
               />
-              <span>Featured</span>
-            </label>
-            <label className="flex items-center space-x-2 text-black">
+            </div>
+
+            {/* Price */}
+            <div>
+              <label className="font-semibold flex items-center gap-2 text-gray-700">
+                <FaDollarSign className="text-green-600" /> Price (RS)
+              </label>
               <input
-                type="checkbox"
-                name="isTodaysDeal"
-                checked={formData.isTodaysDeal}
+                name="price"
+                type="number"
+                step="0.01"
+                value={formData.price}
                 onChange={handleChange}
-                className="border border-black"
+                placeholder="Regular Price"
+                required
+                className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-green-500 mt-1 shadow-sm"
               />
-              <span>Today's Deal</span>
-            </label>
-          </div>
-          {formData.isTodaysDeal && (
-            <input
-              type="date"
-              name="dealExpiresAt"
-              value={formData.dealExpiresAt}
-              onChange={handleChange}
-              className="border border-black p-2 rounded bg-white text-black"
-            />
-          )}
-          <div className="flex space-x-4">
-            <input
-              name="average"
-              type="number"
-              step="0.1"
-              min="0"
-              max="5"
-              value={formData.rating.average}
-              onChange={handleChange}
-              placeholder="Average Rating"
-              className="border border-black p-2 rounded bg-white text-black"
-            />
-            <input
-              name="count"
-              type="number"
-              min="0"
-              value={formData.rating.count}
-              onChange={handleChange}
-              placeholder="Rating Count"
-              className="border border-black p-2 rounded bg-white text-black"
-            />
-          </div>
-          <div className="flex justify-end space-x-4 mt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-white border border-black text-black rounded hover:bg-gray-100 transition-colors cursor-pointer shadow-lg"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-yellow-400 border border-yellow-500 text-black rounded hover:bg-yellow-500 hover:text-white transition-colors cursor-pointer shadow-lg"
-            >
-              Update
-            </button>
-          </div>
-        </form>
+            </div>
+
+            {/* Discount Price */}
+            <div>
+              <label className="font-semibold text-gray-700">Discount Price</label>
+              <input
+                name="discountPrice"
+                type="number"
+                step="0.01"
+                value={formData.discountPrice}
+                onChange={handleChange}
+                placeholder="Discounted Price"
+                className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-green-500 mt-1 shadow-sm"
+              />
+            </div>
+
+            {/* Calories */}
+            <div>
+              <label className="font-semibold flex items-center gap-2 text-gray-700">
+                <FaFire className="text-red-500" /> Calories
+              </label>
+              <input
+                name="calories"
+                type="number"
+                value={formData.calories}
+                onChange={handleChange}
+                placeholder="Calories"
+                className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-red-400 mt-1 shadow-sm"
+              />
+            </div>
+
+            {/* Image URL + Preview */}
+            <div className="md:col-span-2">
+              <label className="font-semibold flex items-center gap-2 text-gray-700">
+                <FaImage className="text-blue-500" /> Image URL
+              </label>
+              <input
+                name="image"
+                value={formData.image}
+                onChange={handleChange}
+                placeholder="Paste image URL"
+                className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 mt-1 shadow-sm"
+              />
+              {formData.image && (
+                <div className="flex flex-col items-center mt-3">
+                  <img
+                    src={formData.image}
+                    alt="Preview"
+                    className="w-40 h-40 object-cover rounded-lg shadow-md border border-gray-200 transition-transform transform hover:scale-105"
+                    onError={(e) => (e.target.style.display = "none")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setViewImage(true)}
+                    className="flex items-center gap-1 mt-2 text-sm text-blue-600 hover:underline"
+                  >
+                    <FaEye /> View Full Image
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Description */}
+            <div className="md:col-span-2">
+              <label className="font-semibold text-gray-700">Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Write a short description..."
+                rows={3}
+                required
+                className="w-full border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-yellow-500 mt-1 shadow-sm"
+              />
+            </div>
+
+            {/* Checkboxes */}
+            <div className="md:col-span-2 flex flex-wrap gap-6">
+              <label className="flex items-center gap-2 text-gray-700 font-medium">
+                <input
+                  type="checkbox"
+                  name="isVegetarian"
+                  checked={formData.isVegetarian}
+                  onChange={handleChange}
+                  className="accent-green-600 w-5 h-5"
+                />
+                <FaLeaf className="text-green-600" /> Vegetarian
+              </label>
+
+              <label className="flex items-center gap-2 text-gray-700 font-medium">
+                <input
+                  type="checkbox"
+                  name="isAvailable"
+                  checked={formData.isAvailable}
+                  onChange={handleChange}
+                  className="accent-yellow-600 w-5 h-5"
+                />
+                Available
+              </label>
+
+              <label className="flex items-center gap-2 text-gray-700 font-medium">
+                <input
+                  type="checkbox"
+                  name="isTodaysDeal"
+                  checked={formData.isTodaysDeal}
+                  onChange={handleChange}
+                  className="accent-blue-600 w-5 h-5"
+                />
+                <FaClock className="text-blue-500" /> Today's Deal
+              </label>
+
+              {formData.isTodaysDeal && (
+                <input
+                  type="date"
+                  name="dealExpiresAt"
+                  value={formData.dealExpiresAt}
+                  onChange={handleChange}
+                  className="border border-gray-200 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 shadow-sm"
+                />
+              )}
+            </div>
+
+            {/* Buttons */}
+            <div className="md:col-span-2 flex justify-end gap-4 mt-6">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex items-center gap-2 px-5 py-2 bg-gray-100 text-gray-700 rounded-full border border-gray-300 hover:bg-gray-200 transition-all shadow-sm"
+              >
+                <FaTimesCircle /> Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex items-center gap-2 px-6 py-2 bg-yellow-500 text-white rounded-full border border-yellow-600 hover:bg-yellow-600 transition-all shadow-md"
+              >
+                <FaCheckCircle /> Update
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+
+      {/* Full Image Modal */}
+      {viewImage && (
+        <div
+          className="fixed inset-0 bg-black/80 flex justify-center items-center z-50"
+          onClick={() => setViewImage(false)}
+        >
+          <img
+            src={formData.image}
+            alt="Full View"
+            className="max-w-3xl max-h-[80vh] object-contain rounded-lg shadow-2xl border border-white animate-zoomIn"
+          />
+        </div>
+      )}
+    </>
   );
 };
 

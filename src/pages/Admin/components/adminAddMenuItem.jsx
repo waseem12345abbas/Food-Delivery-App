@@ -29,7 +29,7 @@ export function AdminAddMenuItem({onClose, onAdd}) {
 
   return (
     <div className="fixed inset-0 backdrop-blur-xs flex justify-center items-center z-50">
-      <div className="bg-black p-6 rounded-md shadow-md w-[90%] max-w-md">
+      <div className="bg-black">
       <h2 className="text-xl text-white font-semibold mb-4">Add New Menu Item</h2>
       <form action="#" method="post" className="space-y-3">
         <input

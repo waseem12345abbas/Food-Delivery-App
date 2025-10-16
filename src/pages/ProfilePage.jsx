@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import api from "../api";
-import { FaStar, FaCrown, FaGem, FaMedal } from "react-icons/fa";
+import { FaStar, FaCrown, FaGem, FaMedal, FaArrowLeft } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const ranks = {
   Newbie: <FaStar className="text-yellow-400 drop-shadow-glow" />,
@@ -57,7 +58,7 @@ export default function ProfilePage() {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-black/90 text-white">
         <p className="text-red-400 text-lg font-bold mb-4">
-          {error || "Failed to load profile."}
+          {error.message || "Failed to load profile."}
         </p>
         <button
           onClick={handleLogout}
@@ -71,12 +72,14 @@ export default function ProfilePage() {
 
   return (
     <div
-      className="min-h-[100vh] flex justify-center items-center relative bg-cover bg-center bg-no-repeat"
+      className="min-h-[100vh] flex gap-2 justify-center items-center relative bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage:
           "url('https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?auto=format&fit=crop&w=1920&q=80')",
       }}
     >
+      <Link to={"/home"} className="flex items-center gap-3 mt-4 px-2 py-1 text-white rounded-2xl shadow-[0_0_25px_#facc15aa] transform hover:scale-105 transition duration-300">
+      <span><FaArrowLeft className="h-5 w-3"/></span><span>Back to home</span></Link>
 
       {/* Card */}
       <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-2xl border border-white/20 rounded-3xl shadow-[0_0_40px_#facc15aa] p-8 overflow-hidden transition-all duration-500 hover:shadow-[0_0_60px_#facc15cc] hover:scale-[1.02]">
@@ -135,7 +138,7 @@ export default function ProfilePage() {
             className="mt-8 bg-gradient-to-r from-yellow-400 via-orange-500 to-yellow-600 text-black font-bold px-8 py-3 rounded-2xl shadow-lg hover:shadow-[0_0_25px_#facc15aa] transform hover:scale-105 transition duration-300"
           >
             Logout
-          </button>
+          </button> 
         </div>
       </div>
     </div>

@@ -11,8 +11,8 @@ const links=[
 const AdminNavbar = () => {
     const location=useLocation();
   return ( 
-    <nav className='w-full md:max-w-64 bg-yellow-400 flex flex-col items-center md:items-start  gap-4  md:min-h-screen px-4 py-6'>
-        <h2 className="text-2xl font-bold mb-4 md:mb-8 text-nowrap">Admin Panel</h2>
+    <nav className='font-serif w-full md:max-w-64 bg-gradient-to-br from-black/50 to-black/100 flex flex-col items-center md:items-start  gap-4  md:min-h-screen px-4'>
+        <h2 className="text-2xl font-bold mb-4 md:mb-8 text-nowrap text-center mt-8">Admin Panel</h2>
         <ul className="flex md:flex-col space-x-2 items-center md:items-start space-y-0 md:space-y-4">
             {
                 links.map((link)=>(

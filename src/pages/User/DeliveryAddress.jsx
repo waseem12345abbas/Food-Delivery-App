@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 const DeliveryAddress = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { cartItems } = location.state || { cartItems: [] };
+  const { cartItems, comment } = location.state || { cartItems: [], comment: "" };
 
   const [address, setAddress] = useState({
     name: "",
@@ -25,9 +25,9 @@ const DeliveryAddress = () => {
       alert("Please fill in all fields.");
       return;
     }
-    // Navigate to proof-of-order with cartItems and address
+    // Navigate to proof-of-order with cartItems, address, and comment
     navigate("/proof-of-order", {
-      state: { cartItems, address },
+      state: { cartItems, address, comment },
     });
   };
 

@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import api from "../../api";
-import { Link, useLocation } from "react-router-dom";
-
+import { Link } from "react-router-dom";
 
 const MyOrder = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const location = useLocation();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -15,21 +13,21 @@ const MyOrder = () => {
         const userType = sessionStorage.getItem("userType");
         const userData = sessionStorage.getItem("userData");
 
-          if (userType === "guest" && userData) {
-            // For guest users, parse guest data and fetch orders by guest email
-            const guestUser = JSON.parse(userData);
-            const guestEmail = guestUser.email;
-            if (guestEmail) {
-              // Fetch orders by guest email
-              const orderRes = await api.get(`/api/orders/${guestEmail}`);
-              setOrders(orderRes.data.data || []);
-            }
+        if (userType === "guest" && userData) {
+          // For guest users, parse guest data and fetch orders by guest email
+          const guestUser = JSON.parse(userData);
+          const guestEmail = guestUser.email;
+          if (guestEmail) {
+            // Fetch orders by guest email
+            const orderRes = await api.get(`/api/orders/${guestEmail}`);
+            setOrders(orderRes.data.data || []);
+          }
           } else {
-            // For authenticated users, fetch profile and then orders
+            // For authenticated users, fetch profile and then orders by userID
             const res = await api.get("/api/profile");
-            const email = res.data.email;
-            if (email) {
-              const orderRes = await api.get(`/api/orders/${email}`);
+            const userId = res.data._id;
+            if (userId) {
+              const orderRes = await api.get(`/api/orders/${userId}`);
               setOrders(orderRes.data.data || []);
             }
           }
@@ -74,38 +72,36 @@ const MyOrder = () => {
         My Orders
       </motion.h1>
 
-     {orders.length === 0 ? (
-  <motion.div
-    className="flex flex-col items-center justify-center py-20 bg-gradient-to-b from-yellow-50 to-yellow-200 rounded-2xl shadow-md max-w-md mx-auto mt-10"
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 0.6 }}
-  >
-    <motion.img
-      src="https://cdn-icons-png.flaticon.com/512/706/706164.png"
-      alt="No Orders"
-      className="w-40 h-40 mb-6 animate-bounce-slow"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 }}
-    />
+      {orders.length === 0 ? (
+        <motion.div
+          className="flex flex-col items-center justify-center py-20 bg-gradient-to-b from-yellow-50 to-yellow-200 rounded-2xl shadow-md max-w-md mx-auto mt-10"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.img
+            src="https://cdn-icons-png.flaticon.com/512/706/706164.png"
+            alt="No Orders"
+            className="w-40 h-40 mb-6 animate-bounce-slow"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          />
 
-    <h2 className="text-2xl font-bold text-black mb-2">
-      No Orders Yet!
-    </h2>
-    <p className="text-gray-700 text-center mb-6 px-6">
-      Looks like you haven’t ordered anything yet.  
-      Discover mouthwatering dishes and place your first order today!
-    </p>
+          <h2 className="text-2xl font-bold text-black mb-2">No Orders Yet!</h2>
+          <p className="text-gray-700 text-center mb-6 px-6">
+            Looks like you haven’t ordered anything yet. Discover mouthwatering
+            dishes and place your first order today!
+          </p>
 
-    <Link
-      to="/"
-      className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105"
-    >
-      Explore Menu
-    </Link>
-  </motion.div>
-) : (
+          <Link
+            to="/"
+            className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105"
+          >
+            Explore Menu
+          </Link>
+        </motion.div>
+      ) : (
         <motion.div
           className="space-y-6"
           initial="hidden"
@@ -118,7 +114,7 @@ const MyOrder = () => {
             },
           }}
         >
-          {orders.map((order) => (
+          {orders.slice(0,1).map((order) => (
             <motion.div
               key={order._id}
               className="relative bg-yellow-400 shadow-lg rounded-2xl p-6 border border-gray-200 hover:shadow-2xl transition-all duration-300"
@@ -127,14 +123,11 @@ const MyOrder = () => {
                 visible: { opacity: 1, y: 0 },
               }}
             >
-             
               {/* Order Header */}
               <div className="flex justify-between items-center mb-4 mt-2">
                 <h2 className="text-lg font-semibold text-black">
                   Order ID:{" "}
-                  <span className="text-white font-bold">
-                    {order._id}
-                  </span>
+                  <span className="text-white font-bold">{order._id}</span>
                 </h2>
                 <span
                   className={`px-3 py-1 text-sm rounded-full font-medium shadow-sm ${
@@ -151,9 +144,7 @@ const MyOrder = () => {
 
               {/* Shipping Details */}
               <div className="mb-4">
-                <h3 className="font-semibold text-black">
-                  Shipping Details
-                </h3>
+                <h3 className="font-semibold text-black">Shipping Details</h3>
                 <p className="text-gray-700">{order.userName}</p>
                 <p className="text-gray-700">{order.userEmail}</p>
               </div>
@@ -193,9 +184,16 @@ const MyOrder = () => {
         </motion.div>
       )}
       {/* view the order */}
-      <div className="flex items-center justify-center py-5">
-      <Link to='/track-order' className="w-full md:w-1/2 bg-yellow-400 hover:bg-yellow-500 text-black text-xl font-bold rounded-lg py-2 border border-yellow-500 text-center">Track Order</Link>
-      </div>
+      {orders.length > 0 && (
+        <div className="flex items-center justify-center py-5">
+          <Link
+            to="/track-order"
+            className="w-full md:w-1/2 bg-yellow-400 hover:bg-yellow-500 text-black text-xl font-bold rounded-lg py-2 border border-yellow-500 text-center"
+          >
+            Track Order
+          </Link>
+        </div>
+      )}
     </motion.div>
   );
 };

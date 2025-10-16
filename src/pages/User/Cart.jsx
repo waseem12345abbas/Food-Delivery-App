@@ -1,15 +1,20 @@
 import { useSelector, useDispatch } from "react-redux";
-import { removeToCart, addToCart, decreaseQuantity } from "../../state_manage/features/cart/Cart";
+import {
+  removeToCart,
+  addToCart,
+  decreaseQuantity,
+} from "../../state_manage/features/cart/Cart";
 import { useNavigate } from "react-router-dom";
 import { FaTimes, FaMinus, FaPlus } from "react-icons/fa";
-
+import { useState } from "react";
 
 const Cart = () => {
+  const [comment, setComment] = useState("");
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.cart);
-  // select user session from redux store if user wants delivery then navigate user to delivery address page 
+  // select user session from redux store if user wants delivery then navigate user to delivery address page
   // otherwise navigate to order proof page
-  const userSession = useSelector((state)=>state.userSession)
+  const userSession = useSelector((state) => state.userSession);
   const navigate = useNavigate();
   // const { user, isAuthed } = useAuth();
   const deliveryFee = 1.0;
@@ -18,15 +23,21 @@ const Cart = () => {
     deliveryFee;
   const handlePlaceOrder = () => {
     // User is authenticated, proceed to order page
-    if(userSession.serviceType === "delivery"){
+    if (userSession.serviceType === "delivery") {
       navigate("/delivery-address", {
-        state: { cartItems},
+        state: { cartItems, comment },
       });
       return;
     }
+
     navigate("/proof-of-order", {
-      state: { cartItems},
+      state: { cartItems, comment },
     });
+  };
+
+  // user comment
+  const handleComment = (value) => {
+    setComment(value);
   };
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -35,28 +46,30 @@ const Cart = () => {
       </h1>
 
       {cartItems.length === 0 ? (
-  <div className="flex flex-col items-center justify-center py-20 bg-gradient-to-b from-yellow-100 to-yellow-200 rounded-xl shadow-md mx-auto max-w-md">
-    <img
-      src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
-      alt="Empty Cart"
-      className="w-40 h-40 mb-6 animate-bounce-slow"
-    />
-    <h2 className="text-2xl font-bold text-black mb-2">Your Cart is Empty!</h2>
-    <p className="text-gray-700 text-center mb-6 px-6">
-      Looks like you haven’t added anything yet.  
-      Explore our delicious menu and add your favorite items!
-    </p>
-    <button
-      onClick={() => navigate("/home")}
-      className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105"
-    >
-      Browse Menu
-    </button>
-  </div>
-) : (
-  // your existing cart display section
+        <div className="flex flex-col items-center justify-center py-20 bg-gradient-to-b from-yellow-100 to-yellow-200 rounded-xl shadow-md mx-auto max-w-md">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
+            alt="Empty Cart"
+            className="w-40 h-40 mb-6 animate-bounce-slow"
+          />
+          <h2 className="text-2xl font-bold text-black mb-2">
+            Your Cart is Empty!
+          </h2>
+          <p className="text-gray-700 text-center mb-6 px-6">
+            Looks like you haven’t added anything yet. Explore our delicious
+            menu and add your favorite items!
+          </p>
+          <button
+            onClick={() => navigate("/home")}
+            className="bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105"
+          >
+            Browse Menu
+          </button>
+        </div>
+      ) : (
+        // your existing cart display section
 
-        <div className="flex flex-col md:flex-row rounded-md shadow-md shadow-neutral-500 rounded-lg bg-neutral-100">
+        <div className="flex flex-col md:flex-row shadow-md shadow-neutral-500 rounded-lg bg-neutral-100">
           <div className="flex-2 flex flex-col">
             {cartItems.map((item) => (
               <div
@@ -83,31 +96,49 @@ const Cart = () => {
                       {item.name}
                     </h2>
                     <div className="flex items-center space-x-4">
-                      <button 
-                      onClick={()=>dispatch(addToCart(item))}
-                      className="py-2 px-4 cursor-pointer bg-yellow-400 rounded-md text-black shadow-[0_4px_4px_0] shadow-yellow-900  hover:scale-105 transition text-xs"><FaPlus/></button>
+                      <button
+                        onClick={() => dispatch(addToCart(item))}
+                        className="py-2 px-4 cursor-pointer bg-yellow-400 rounded-md text-black shadow-[0_4px_4px_0] shadow-yellow-900  hover:scale-105 transition text-xs"
+                      >
+                        <FaPlus />
+                      </button>
                       <span className="text-black font-bold text-lg">
                         {item.quantity}
                       </span>
-                      <button 
-                      onClick={()=>dispatch(decreaseQuantity(item._id))}
-                      className="py-2 px-4 cursor-pointer bg-yellow-400 rounded-md text-white shadow-[0_4px_4px_0] shadow-yellow-900  hover:scale-105 transition text-xs"><FaMinus/></button>
-                    </div>
                       <button
-                    onClick={() => dispatch(removeToCart(item._id))}
-                    className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-md shadow-[0_4px_4px_0] shadow-yellow-900 hover:scale-105 transition text-sm cursor-pointer"
-                  >
-                    <FaTimes/>
-                  </button>
+                        onClick={() => dispatch(decreaseQuantity(item._id))}
+                        className="py-2 px-4 cursor-pointer bg-yellow-400 rounded-md text-white shadow-[0_4px_4px_0] shadow-yellow-900  hover:scale-105 transition text-xs"
+                      >
+                        <FaMinus />
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => dispatch(removeToCart(item._id))}
+                      className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-md shadow-[0_4px_4px_0] shadow-yellow-900 hover:scale-105 transition text-sm cursor-pointer"
+                    >
+                      <FaTimes />
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
+
+            {/* comment about the order */}
+            <div className="flex items-center justify-center pb-5">
+              <input
+                onChange={(e) => handleComment(e.target.value)}
+                type="text"
+                placeholder="Any Extra Comment"
+                className="w-1/2 p-2 rounded-md bg-white placeholder:text-black focus:ring-1 focus:ring-yellow-500 shadow-md shadow-neutral-400 outline-none"
+              />
+            </div>
           </div>
 
           {/* Right: Order Summary */}
-          <div className="w-full md:w-96 bg-white p-6 rounded-r rounded-lg flex-1 bg-yellow-400">
-            <h2 className="text-center text-2xl font-semibold mb-6">Order Summary</h2>
+          <div className="w-full md:w-96 p-6 rounded-r rounded-lg flex-1 bg-yellow-400">
+            <h2 className="text-center text-2xl font-semibold mb-6">
+              Order Summary
+            </h2>
             <ul className="space-y-4 overflow-y-auto pr-2">
               {cartItems.map((item) => (
                 <li
@@ -121,7 +152,7 @@ const Cart = () => {
                     </p>
                   </div>
                   <p className="font-semibold">
-                    RS{(item.discountPrice || item.price) * item.quantity}
+                    RS {(item.discountPrice || item.price) * item.quantity}
                   </p>
                 </li>
               ))}
@@ -129,19 +160,19 @@ const Cart = () => {
             <div className="flex items-center justify-between py-3">
               <span className="text-base font-semibold">Delivery Fee</span>
               <span className="pr-2 font-semibold">
-                RS{deliveryFee.toFixed(2)}
+                RS {deliveryFee.toFixed(2)}
               </span>
             </div>
             <div className="border-t mt-6 pt-4 flex justify-between text-lg font-bold">
               <span>Total:</span>
-              <span>RS{totalPrice.toFixed(2)}</span>
+              <span>RS {totalPrice.toFixed(2)}</span>
             </div>
 
             <button
               onClick={handlePlaceOrder}
               className="w-full mt-6 bg-white hover:bg-neutral-200 text-black shadow-b-lg cursor-pointer shadow-neutral-500 py-3 rounded-xl font-semibold transition duration-300 shadow-md"
             >
-              Place Order
+              Proceed next
             </button>
           </div>
         </div>

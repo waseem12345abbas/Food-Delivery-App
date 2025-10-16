@@ -33,6 +33,8 @@ const LoginForm = () => {
         const redirectPath = sessionStorage.getItem("redirectAfterLogin");
         if (redirectPath) {
           sessionStorage.removeItem("redirectAfterLogin");
+          // remove guest user from session storage if user is logged in
+          sessionStorage.removeItem("guestUser");
           setTimeout(() => navigate(redirectPath), 700);
         } else {
           setTimeout(() => navigate("/home"), 700);

@@ -35,7 +35,7 @@ function Layout({ toggleTheme, darkMode }) {
   const location = useLocation();
   const hideNavbarFooter = location.pathname.startsWith('/admin')
   ||
-  ["/login","/register","/","/login-or-guest"].includes(location.pathname);
+  ["/login","/register","/","/login-or-guest","/profile"].includes(location.pathname);
   return (
     <>
       {!hideNavbarFooter && <Header toggleTheme={toggleTheme} darkMode={darkMode} />}

@@ -49,7 +49,7 @@ const ProofOfOrder = () => {
   const [payAtCounter, setPayAtCounter] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { cartItems, address } = location.state || { cartItems: [], address: null };
+  const { cartItems, address, comment } = location.state || { cartItems: [], address: null , comment: ""};
 
   const orderData = cartItems.map((order) => ({
     id: order._id,
@@ -74,7 +74,7 @@ const ProofOfOrder = () => {
     if (e) e.preventDefault();
     if (userSession.serviceType === "dine-in" && payAtCounterParam) {
       // No validation needed, proceed directly
-      const success = await submitOrder();
+      const success = await submitOrder(payAtCounterParam);
       if (success) {
         navigate(NAVIGATION_PATHS.MY_ORDER);
       } else {
@@ -84,7 +84,7 @@ const ProofOfOrder = () => {
       if (!validateForm()) {
         return;
       }
-      const success = await submitOrder();
+      const success = await submitOrder(payAtCounterParam);
       if (success) {
         navigate(NAVIGATION_PATHS.MY_ORDER);
       } else {
@@ -97,25 +97,32 @@ const ProofOfOrder = () => {
   // if user is guest then it will send only paymentId, proof image and cart items
   // after successful submission it will navigate to success page or show error message
   // submit guest order
-  const submitOrder = async () => {
+  const submitOrder = async (payAtCounterParam = false) => {
     setIsLoading(true);
     const formDataToSend = new FormData();
     formDataToSend.append("cartItems", JSON.stringify(orderData));
     if(address){
       formDataToSend.append("address", JSON.stringify(address));
     }
-    if (payAtCounter) {
+    if(comment){
+      formDataToSend.append("comment", comment)
+    }
+    console.log("Submitting order with payAtCounter:", payAtCounterParam);
+    console.log("User data:", user || userFromStore);
+    if (payAtCounterParam) {
       formDataToSend.append("payAtCounter", true);
-      formDataToSend.append("userData", JSON.stringify(userFromStore));
+      formDataToSend.append("userData", JSON.stringify(user || userFromStore));
     } else {
       formDataToSend.append("paymentId", paymentId);
       formDataToSend.append("proofImage", file);
       formDataToSend.append("userData", JSON.stringify(user || userFromStore));
+
     }
     try {
       const res = await api.post("/api/userOrder", formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      console.log("Order submission response:", res.data);
       if (res.data.success) {
         setOrderSubmitted(true);
       } else {
@@ -124,6 +131,7 @@ const ProofOfOrder = () => {
       }
       return true;
     } catch (error) {
+      console.error("Order submission error:", error);
       alert(error?.message || ERROR_MESSAGES.SUBMIT_ERROR);
       return false;
     } finally {

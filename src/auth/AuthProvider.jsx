@@ -116,6 +116,9 @@ export default function AuthProvider({ children }) {
     setUser(r.data.user);
     // Sync token to localStorage for consistency
     localStorage.setItem("token", r.data.accessToken);
+    // Clear guest session if present
+    sessionStorage.removeItem("userType");
+    sessionStorage.removeItem("userData");
     return r.data;
   };
   const logout = async () => {

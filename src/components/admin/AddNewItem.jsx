@@ -1,6 +1,16 @@
 import React, { useState } from "react";
-import axios from "axios";
 import api from "../../api";
+import {
+  FaLeaf,
+  FaTags,
+  FaUtensils,
+  FaImage,
+  FaDollarSign,
+  FaFire,
+  FaPercent,
+  FaClock,
+  FaPlusCircle,
+} from "react-icons/fa";
 
 const AddNewItem = () => {
   const [formData, setFormData] = useState({
@@ -13,10 +23,8 @@ const AddNewItem = () => {
     calories: "",
     isVegetarian: false,
     isAvailable: true,
-    isFeatured: false,
     isTodaysDeal: false,
     dealExpiresAt: "",
-    rating: { average: 0, count: 0 },
     createdAt: new Date(),
     updatedAt: new Date(),
     image: "",
@@ -26,23 +34,12 @@ const AddNewItem = () => {
   const [error, setError] = useState(false);
 
   const handleChange = (e) => {
-    const { name , value, type, checked } = e.target;
-    // Handle checkbox inputs
-    setFormData(prev=>({
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
-  const handleRatingChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      rating: {
-        ...prev.rating,
-        [name]: parseFloat(value)
-      }
-    }));
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,10 +58,8 @@ const AddNewItem = () => {
           calories: "",
           isVegetarian: false,
           isAvailable: true,
-          isFeatured: false,
           isTodaysDeal: false,
           dealExpiresAt: "",
-          rating: { average: 0, count: 0 },
           createdAt: new Date(),
           updatedAt: new Date(),
           image: "",
@@ -78,201 +73,203 @@ const AddNewItem = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 px-4">
-      <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-yellow-50 to-white p-6">
+      <div className="w-full max-w-5xl bg-white/90 shadow-2xl rounded-2xl p-8 border border-yellow-100 backdrop-blur-sm">
+        <h2 className="text-4xl font-extrabold text-yellow-700 mb-2 text-center tracking-wide">
           🍔 Add New Food Item
         </h2>
-        <p className="text-gray-500 text-center mb-6">
-          Fill in the details to add a new item to the menu.
+        <p className="text-gray-500 text-center mb-8">
+          Fill in the details below to add a new delicious item to the menu.
         </p>
-         <form onSubmit={handleSubmit} className="grid grid-cols-1 xl:grid-cols-2 gap-6 overflow-auto p-4">
-    {/* Basic Information */}
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Basic Information</h3>
-      <input
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        placeholder="Item Name"
-        className="w-full border focus:border-none rounded-md p-3 focus:outline-none focus:ring-1 focus:ring-yellow-500"
-        required
-      />
-      <textarea
-        name="description"
-        value={formData.description}
-        onChange={handleChange}
-        placeholder="Description"
-        rows={3}
-        className="w-full border focus:border-none rounded-md p-3 focus:outline-none focus:ring-1 focus:ring-yellow-500"
-        required
-      />
-      <input
-        name="image"
-        value={formData.image}
-        onChange={handleChange}
-        placeholder="Image URL"
-        className="w-full border focus:border-none rounded-md p-3 focus:outline-none focus:ring-1 focus:ring-yellow-500"
-        required
-      />
-    </div>
 
-    {/* Categories */}
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Categories</h3>
-      <input
-        name="category"
-        value={formData.category}
-        onChange={handleChange}
-        placeholder="Main Category (e.g., Burger)"
-        className="w-full border focus:border-none rounded-md p-3 focus:outline-none focus:ring-1 focus:ring-yellow-500"
-        required
-      />
-      <input
-        name="subCategory"
-        value={formData.subCategory}
-        onChange={handleChange}
-        placeholder="Sub-category (e.g., Chicken)"
-        className="w-full border focus:border-none rounded-md p-3 focus:outline-none focus:ring-1 focus:ring-yellow-500"
-      />
-    </div>
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        >
+          {/* Basic Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-700">
+              <FaUtensils className="text-yellow-600" /> Basic Information
+            </h3>
+            <input
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Item Name"
+              className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 shadow-sm"
+              required
+            />
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Description"
+              rows={3}
+              className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 shadow-sm"
+              required
+            />
 
-    {/* Pricing */}
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Pricing</h3>
-      <input
-        name="price"
-        type="number"
-        step="0.01"
-        value={formData.price}
-        onChange={handleChange}
-        placeholder="Regular Price (RS)"
-        className="w-full border focus:border-none rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-        required
-      />
-      <input
-        name="discountPrice"
-        type="number"
-        step="0.01"
-        value={formData.discountPrice}
-        onChange={handleChange}
-        placeholder="Discount Price (RS)"
-        className="w-full border focus:border-none rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-      />
-    </div>
+            {/* Image Input with Live Preview */}
+            <div className="space-y-2">
+              <div className="relative">
+                <FaImage className="absolute top-3 left-3 text-gray-400" />
+                <input
+                  name="image"
+                  value={formData.image}
+                  onChange={handleChange}
+                  placeholder="Image URL"
+                  className="w-full border rounded-lg p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-yellow-500 shadow-sm"
+                  required
+                />
+              </div>
 
-    {/* Nutrition & Details */}
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Nutrition & Details</h3>
-      <input
-        name="calories"
-        type="number"
-        value={formData.calories}
-        onChange={handleChange}
-        placeholder="Calories"
-        className="w-full border focus:border-none rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-      />
-      <div className="flex items-center space-x-4">
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            name="isVegetarian"
-            checked={formData.isVegetarian}
-            onChange={handleChange}
-            className="mr-2"
-          />
-          Vegetarian
-        </label>
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            name="isAvailable"
-            checked={formData.isAvailable}
-            onChange={handleChange}
-            className="mr-2"
-          />
-          Available
-        </label>
-      </div>
-    </div>
+              {formData.image && (
+                <div className="flex justify-center mt-3">
+                  <img
+                    src={formData.image}
+                    alt="Preview"
+                    className="w-40 h-40 object-cover rounded-lg shadow-md border border-yellow-200 transition-transform transform hover:scale-105"
+                    onError={(e) => (e.target.style.display = "none")}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
 
-    {/* Promotions */}
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Promotions</h3>
-      <label className="flex items-center">
-        <input
-          type="checkbox"
-          name="isFeatured"
-          checked={formData.isFeatured}
-          onChange={handleChange}
-          className="mr-2"
-        />
-        Featured Item
-      </label>
-      <div className="flex items-center space-x-4">
-        <label className="flex items-center">
-          <input
-            type="checkbox"
-            name="isTodaysDeal"
-            checked={formData.isTodaysDeal}
-            onChange={handleChange}
-            className="mr-2"
-          />
-          Today's Deal
-        </label>
-        {formData.isTodaysDeal && (
-          <input
-            type="date"
-            name="dealExpiresAt"
-            value={formData.dealExpiresAt}
-            onChange={handleChange}
-            className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-        )}
-      </div>
-    </div>
+          {/* Categories */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-700">
+              <FaTags className="text-yellow-600" /> Categories
+            </h3>
+            <input
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              placeholder="Main Category (e.g., Burger)"
+              className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 shadow-sm"
+              required
+            />
+            <input
+              name="subCategory"
+              value={formData.subCategory}
+              onChange={handleChange}
+              placeholder="Sub-category (e.g., Chicken)"
+              className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 shadow-sm"
+            />
+          </div>
 
-    {/* Rating */}
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Initial Rating</h3>
-      <input
-        name="average"
-        type="number"
-        step="0.1"
-        min="0"
-        max="5"
-        value={formData.rating.average}
-        onChange={handleRatingChange}
-        placeholder="Average Rating (0-5)"
-        className="w-full border focus:border-none rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-      />
-      <input
-        name="count"
-        type="number"
-        min="0"
-        value={formData.rating.count}
-        onChange={handleRatingChange}
-        placeholder="Rating Count"
-        className="w-full border focus:border-none rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-      />
-    </div>
+          {/* Pricing */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-700">
+              <FaDollarSign className="text-green-600" /> Pricing
+            </h3>
+            <input
+              name="price"
+              type="number"
+              step="0.01"
+              value={formData.price}
+              onChange={handleChange}
+              placeholder="Regular Price (RS)"
+              className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
+              required
+            />
+            <input
+              name="discountPrice"
+              type="number"
+              step="0.01"
+              value={formData.discountPrice}
+              onChange={handleChange}
+              placeholder="Discount Price (RS)"
+              className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-sm"
+            />
+          </div>
 
-    {/* Submit Button */}
-    <div className="col-span-1 md:col-span-2 flex justify-center pt-4">
-      <button
-      
-        type="submit"
-        className="bg-black transition text-white px-8 py-3 rounded-md font-semibold text-lg cursor-pointer"
-      >
-        ➕ Add Product
-      </button>
-    </div>
-  </form>
+          {/* Nutrition & Details */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-700">
+              <FaFire className="text-red-500" /> Nutrition & Details
+            </h3>
+            <input
+              name="calories"
+              type="number"
+              value={formData.calories}
+              onChange={handleChange}
+              placeholder="Calories"
+              className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 shadow-sm"
+            />
+            <div className="flex items-center space-x-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="isVegetarian"
+                  checked={formData.isVegetarian}
+                  onChange={handleChange}
+                  className="accent-green-600"
+                />
+                <FaLeaf className="text-green-600" /> Vegetarian
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="isAvailable"
+                  checked={formData.isAvailable}
+                  onChange={handleChange}
+                  className="accent-yellow-600"
+                />
+                Available
+              </label>
+            </div>
+          </div>
 
+          {/* Promotions */}
+          <div className="space-y-4 md:col-span-2">
+            <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-700">
+              <FaPercent className="text-blue-600" /> Promotions
+            </h3>
+            <div className="flex items-center gap-4 flex-wrap">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="isTodaysDeal"
+                  checked={formData.isTodaysDeal}
+                  onChange={handleChange}
+                  className="accent-blue-600"
+                />
+                Today's Deal
+              </label>
+              {formData.isTodaysDeal && (
+                <div className="flex items-center gap-2">
+                  <FaClock className="text-gray-500" />
+                  <input
+                    type="date"
+                    name="dealExpiresAt"
+                    value={formData.dealExpiresAt}
+                    onChange={handleChange}
+                    className="border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="col-span-1 md:col-span-2 flex justify-center pt-6">
+            <button
+              type="submit"
+              className="flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg transition-transform transform hover:scale-105 active:scale-95"
+            >
+              <FaPlusCircle /> Add Product
+            </button>
+          </div>
+        </form>
+
+        {/* Message */}
         {message && (
           <div
-            className={`mt-6 text-center px-4 py-2 rounded-md ${
-              error ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
+            className={`mt-8 text-center px-6 py-3 rounded-lg font-medium text-lg shadow-md ${
+              error
+                ? "bg-red-100 text-red-700 border border-red-300"
+                : "bg-green-100 text-green-700 border border-green-300"
             }`}
           >
             {message}
